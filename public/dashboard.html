@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - Roomie Task Manager</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+    <!-- Load Auth module first -->
+    <script src="/js/auth.js"></script>
+  </head>
+  <body>
+    <div class="dashboard-root">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="sidebar-logo">
+          <img class="faceavatar" src="/assets/logo.png" alt="Logo" />
+        </div>
+        <nav class="sidebar-nav">
+          <a href="#" class="active">Dashboard</a>
+          <a href="#">Home</a>
+          <a href="tasks.html">Tasks</a>
+          <a href="roommates.html">Roommates</a>
+          <a href="#">Settings</a>
+        </nav>
+      </aside>
+
+      <!-- Main Content -->
+      <div class="main-content">
+        <!-- Top Nav -->
+        <header class="top-nav">
+          <h1>Welcome to ROOMIE</h1>
+          <div class="profile-menu">
+            <span class="profile-name"></span>
+            <button class="logout-btn">Log out</button>
+          </div>
+        </header>
+
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid">
+          <!-- Today's Tasks -->
+          <section class="card tasks-card">
+            <h2>Today's Tasks</h2>
+            <ul id="tasks-list">
+              <!-- Populated by JS -->
+            </ul>
+          </section>
+
+          <!-- Upcoming Deadlines -->
+          <section class="card deadlines-card">
+            <h2>Upcoming Deadlines</h2>
+            <table class="deadlines-table">
+              <tbody id="deadlines-list">
+                <!-- Populated by JS -->
+              </tbody>
+            </table>
+          </section>
+
+          <!-- Roommate Activity -->
+          <section class="card activity-card">
+            <h2>Roommate Activity</h2>
+            <ul id="activity-list">
+              <!-- Populated by JS -->
+            </ul>
+          </section>
+
+          <!-- Expenses Overview -->
+          <section class="card expenses-card">
+            <h2>Expenses Overview</h2>
+            <ul id="expenses-list">
+              <!-- Populated by JS -->
+            </ul>
+          </section>
+
+          <!-- Notifications -->
+          <section class="card notifications-card">
+            <h2>Notifications</h2>
+            <ul id="notifications-list">
+              <!-- Populated by JS -->
+            </ul>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <!-- Load dashboard script after DOM is ready -->
+    <script src="js/dashboard.js"></script>
+    <script src="js/shared.js"></script>
+  </body>
+</html>

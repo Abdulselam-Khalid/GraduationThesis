@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - Roomie Task Manager</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+    <!-- Load Auth module first -->
+    <script src="/js/auth.js"></script>
+  </head>
+  <body>
+    <div class="dashboard-root">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="sidebar-logo">
+          <img class="faceavatar" src="/assets/logo.png" alt="Logo" />
+        </div>
+        <nav class="sidebar-nav">
+          <a href="dashboard.html">Dashboard</a>
+          <a href="#">Home</a>
+          <a href="tasks.html" >Tasks</a>
+          <a href="roommates.html" class="active">Roommates</a>
+          <a href="#">Settings</a>
+        </nav>
+      </aside>
+
+      <!-- Main Content -->
+      <div class="main-content">
+        <!-- Top Nav -->
+        <header class="top-nav">
+          <h1>Welcome to ROOMIE</h1>
+          <div class="profile-menu">
+            <span class="profile-name"></span>
+            <button class="logout-btn">Log out</button>
+          </div>
+        </header>
+
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid">
+        <!-- Today's Tasks -->
+        <section class="card names-card">
+          <h2>Roommates</h2>
+          <div id="names-list" style="margin-bottom: 20px;">
+            <!-- Populated by JS -->
+          </div>
+        </section>
+        
+      </div>
+        <div class="dashboard-grid">
+        <!-- Today's Tasks -->
+        <section class="card tasks-card">
+          <h2>Roommate Tasks</h2>
+          <ul id="tasks-list">
+            <!-- Populated by JS -->
+          </ul>
+          
+        </section>
+        
+      </div>
+    </div>
+
+    <!-- Load dashboard script after DOM is ready -->
+    
+    
+    <script src="/js/roommates.js"></script>
+    <script src="/js/shared.js"></script>
+  </body>
+</html>

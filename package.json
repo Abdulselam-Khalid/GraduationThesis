@@ -1,0 +1,29 @@
+{
+  "name": "roomie-task-manager",
+  "version": "1.0.0",
+  "description": "Roomie Task Manager - A task management application",
+  "main": "server.js",
+  "scripts": {
+    "start": "nodemon server.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.13.2"
+  },
+  "devDependencies": {
+    "eslint": "^9.22.0",
+    "nodemon": "^3.0.3"
+  },
+  "keywords": [
+    "task-manager",
+    "express",
+    "mongodb"
+  ],
+  "author": "",
+  "license": "ISC"
+}

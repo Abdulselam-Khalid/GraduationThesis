@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - Roomie Task Manager</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+    <script src="/js/auth.js" defer></script>
+    <script defer>
+      document.addEventListener("DOMContentLoaded", () => {
+        Auth.redirectIfLoggedIn();
+        initLogin();
+      });
+    </script>
+  </head>
+  <body class="login-body">
+    <div class="LoginCard">
+      <img class="faceavatar" src="/assets/logo.png" alt="Logo" />
+      <h2>Log in to Roomie</h2>
+      <form id="loginForm">
+        <input
+          id="email"
+          type="email"
+          class="primaryInput focus"
+          placeholder="E-Mail"
+          required
+        />
+        <input
+          id="password"
+          type="password"
+          class="primaryInput focus"
+          placeholder="Password"
+          required
+        />
+        <p id="errorMessage" class="error-message" style="display: none"></p>
+        <a href="/register.html" tabindex="-1">
+          <small>Don't have an account</small>
+        </a>
+        <button type="submit" class="primary-button blue" id="loginButton">
+          Login
+        </button>
+      </form>
+    </div>
+  </body>
+</html>
