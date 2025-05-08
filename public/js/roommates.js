@@ -77,11 +77,23 @@ async function renderMembers(groups) {
       button.addEventListener("click", addMember);
     });
   }
-  document.querySelectorAll("#remove-member").forEach((button) => {
-    button.addEventListener("click", removeMember);
-  });
+  if (userData.id != groupData.createdBy) {
+    if (!document.querySelector("#leave-group-button")) {
+      const button = document.createElement("button");
+      button.innerHTML = "Leave Group";
+      button.classList = "leave-btn";
+      button.id = "leave-group-button";
+      const section = document.querySelector(".names-card");
+      section.appendChild(button);
+      document.querySelectorAll("#leave-group-button").forEach((button) => {
+        button.addEventListener("click", leaveGroup);
+      });
+    }
+    document.querySelectorAll("#remove-member").forEach((button) => {
+      button.addEventListener("click", removeMember);
+    });
+  }
 }
-
 function renderTasks(tasks) {
   const list = document.getElementById("tasks-list");
   list.innerHTML = "";
@@ -176,6 +188,7 @@ async function fetchAndRenderTasks() {
     renderTasks(tasks);
   } catch (error) {
     console.error("Error loading tasks or members:", error);
+    noGroup()
   }
 }
 
@@ -186,14 +199,25 @@ async function addTask() {
   const description = prompt("Enter task description:");
   if (!description) return;
 
-  const token = sessionStorage.getItem("token");
+  const memberName = prompt("Enter member name:");
+  if (!memberName) return;
+
+  const member = groupData.members.find(
+    (m) => m.name.toLowerCase() === memberName.toLowerCase()
+  );
+
+  if (!member) {
+    alert("Member not found in the group.");
+    return;
+  }
+
   if (!token) {
     alert("You must be logged in to add a task.");
     return;
   }
 
   try {
-    const response = await fetch("http://localhost:5000/api/tasks", {
+    let response = await fetch("http://localhost:5000/api/tasks", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -202,14 +226,14 @@ async function addTask() {
       body: JSON.stringify({
         title: title,
         description: description,
-        assignedTo: userData.id,
+        assignedTo: member._id,
       }),
     });
 
     if (!response.ok) {
       throw new Error("Failed to add task");
     }
-
+    alert(`Task assigned to ${member.name} successfully`);
     fetchAndRenderTasks();
   } catch (error) {
     console.error(error);
@@ -262,6 +286,34 @@ const removeTask = async (e) => {
   fetchAndRenderTasks();
 };
 
+const leaveGroup = async (e) => {
+
+  if (!confirm(`Are you sure you want to leave "${groupData.name}"?`)) return;
+
+  // You can now send both IDs to your backend:
+  try {
+    const response = await fetch(
+      `http://localhost:5000/api/groups/${groupData._id}/members/${userData.id}`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to remove member");
+    }
+    alert(`You left "${groupData.name}"`)
+    await fetchAndRenderTasks(); // Refresh UI
+  } catch (error) {
+    console.error("Error removing member:", error);
+    alert(error);
+  }
+
+};
 const removeMember = async (e) => {
   const memberId = e.target.dataset.id;
   const groupId = e.target.dataset.groupId;
@@ -330,9 +382,19 @@ async function addMember() {
     fetchAndRenderTasks(); // Refresh to reflect the new member
   } catch (error) {
     console.error("Error adding member:", error);
-    alert("Could not add member. See console for details.");
+    alert(`${error}`);
   }
 }
+const noGroup = () => {
+  const list = document.getElementById("names-list");
+  const taskList = document.getElementById("tasks-list");
+
+  const text = document.createElement("h4");
+  text.innerHTML = "Not a member of any group";
+
+  list.appendChild(text.cloneNode(true));
+  taskList.appendChild(text);
+};
 
 document.addEventListener("DOMContentLoaded", async () => {
   await fetchAndRenderTasks();

@@ -1,4 +1,4 @@
 Roommie (To-Do-List)
 
-1. Assign tasks to other members of the group
+1. Handle tasks display when the user is not a member of any group
 2. 

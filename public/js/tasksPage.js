@@ -101,6 +101,18 @@ async function addTask() {
   const description = prompt("Enter task description:");
   if (!description) return;
 
+  const memberName = prompt("Enter member name:");
+  if (!memberName) return;
+
+  const member = groupData.members.find(
+    (m) => m.name.toLowerCase() === memberName.toLowerCase()
+  );
+  
+  if (!member) {
+    alert("Member not found in the group.");
+    return;
+  }
+
   if (!token) {
     alert("You must be logged in to add a task.");
     return;
@@ -116,13 +128,14 @@ async function addTask() {
       body: JSON.stringify({
         title: title,
         description: description,
-        assignedTo: userData.id,
+        assignedTo: member._id,
       }),
     });
 
     if (!response.ok) {
       throw new Error("Failed to add task");
     }
+    alert(`Task assigned to ${member.name} successfully`)
 
     fetchAndRenderTasks();
   } catch (error) {

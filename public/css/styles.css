@@ -62,7 +62,7 @@ body {
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color 0.3s;
 }
 
 .primary-button.blue {
@@ -180,7 +180,7 @@ body {
   font-size: 1.1rem;
   padding: 0.75rem 1rem;
   border-radius: 6px;
-  transition: all 0.2s ease;
+  transition: all 0.3 ease;
 }
 
 .sidebar-nav a.active,
@@ -217,7 +217,7 @@ body {
   border-radius: 6px;
   font-size: 1rem;
   background: #f5f6fa;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
 }
 
 .search-bar:focus {
@@ -245,7 +245,7 @@ body {
   padding: 0.5rem 1rem;
   font-size: 1rem;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
 }
 
 .logout-btn:hover {
@@ -271,7 +271,7 @@ body {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .card:hover {
@@ -313,7 +313,7 @@ body {
   font-size: 1rem;
   cursor: pointer;
   align-self: flex-end;
-  transition: background 0.2s;
+  transition: background 0.3s;
 }
 .add-btn:hover {
   background: #232946;
@@ -327,7 +327,7 @@ body {
   font-size: 1rem;
   cursor: pointer;
   align-self: flex-end;
-  transition: background 0.2s;
+  transition: background 0.3s;
 }
 .completed-task-btn:hover {
   background: hsl(118, 90%, 30%);
@@ -341,7 +341,7 @@ body {
   font-size: 1rem;
   cursor: no-drop;
   align-self: flex-end;
-  transition: background 0.2s;
+  transition: background 0.3s;
 }
 
 /* --- Deadlines --- */
@@ -421,7 +421,7 @@ body {
   background-color: #f4f4f4;
 }
 
-.remove-btn {
+.remove-btn, .leave-btn {
   background: hsl(0, 100%, 50%);
   color: #fff;
   border: none;
@@ -430,11 +430,13 @@ body {
   font-size: 1rem;
   cursor: pointer;
   align-self: flex-end;
-  transition: background 0.2s;
+  transition: background 0.3s;
 }
-
-.remove-btn:hover {
-  background-color: darkred;
+.leave-btn{
+  border-radius: 6px;
+}
+.remove-btn:hover, .leave-btn:hover {
+  background-color: hsl(0, 100%, 40%);
 }
 
 /* --- Responsive --- */
