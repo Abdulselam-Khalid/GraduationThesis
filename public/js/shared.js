@@ -1,7 +1,7 @@
 // shared.js
 
 const usernameElement = document.querySelector(".profile-name");
-let userName = sessionStorage.getItem("userName");
+let userName = userData.name
 
 if (usernameElement && userName) {
   userName = userName.replace(/"/g, "");

@@ -14,6 +14,11 @@ const TaskSchema = new mongoose.Schema({
     ref: 'User',
     required: [true, "Please assign the task to a user"]
   },
+  groupId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref:'Group',
+    required:[true, 'User must be a member of a group']
+  },
   dueDate: {
     type: Date,
   },

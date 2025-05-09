@@ -13,24 +13,32 @@ const getMembers = async (req, res) => {
     res.status(500).json({error:err.message})
   }
 };
+// const getGroupTasks = async (req, res) => {
+//   const groupId = req.params.groupId;
+
+//   try {
+//       // Find the group and get member IDs
+//       const group = await Group.findById(groupId);
+//       if (!group) {
+//           return res.status(404).json({ message: "Group not found" });
+//       }
+
+//       // Retrieve tasks assigned to any member of the group
+//       const tasks = await Task.find({ assignedTo: { $in: group.members } }).populate("assignedTo", "name email");
+
+//       res.status(200).json(tasks);
+//   } catch (err) {
+//       res.status(500).json({ error: err.message });
+//   }
+// };
 const getGroupTasks = async (req, res) => {
-  const groupId = req.params.groupId;
-
-  try {
-      // Find the group and get member IDs
-      const group = await Group.findById(groupId);
-      if (!group) {
-          return res.status(404).json({ message: "Group not found" });
-      }
-
-      // Retrieve tasks assigned to any member of the group
-      const tasks = await Task.find({ assignedTo: { $in: group.members } }).populate("assignedTo", "name email");
-
-      res.status(200).json(tasks);
-  } catch (err) {
-      res.status(500).json({ error: err.message });
+  try{
+    const tasks = await Task.find({groupId:req.params.groupId}).populate("assignedTo", "name email")
+    res.status(200).json(tasks)
+  }catch(err){
+    res.status(500).json({error: err.message})
   }
-};
+}
 const removeMember = async (req, res) => {
   const { groupId, memberId } = req.params;
 
@@ -44,11 +52,13 @@ const removeMember = async (req, res) => {
     if (!group) {
       return res.status(404).json({ message: "Group not found" });
     }
+    
+    await Task.deleteMany({ assignedTo: memberId });
 
     res.status(200).json({ message: "Member removed successfully", group });
   } catch (error) {
     console.error("Error removing member:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ message: error.message });
   }
 };
 const addMember = async (req, res) => {

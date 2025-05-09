@@ -69,6 +69,31 @@ function renderTasks(tasks) {
   });
 }
 
+// async function fetchAndRenderTasks() {
+//   if (!token) {
+//     window.location.href = "/login.html";
+//     return;
+//   }
+
+//   try {
+//     const response = await fetch("http://localhost:5000/api/tasks", {
+//       headers: {
+//         Authorization: `Bearer ${token}`,
+//         "Content-Type": "application/json",
+//       },
+//     });
+
+//     if (!response.ok) {
+//       throw new Error("Failed to fetch tasks");
+//     }
+
+//     const tasks = await response.json();
+//     renderTasks(tasks);
+//   } catch (error) {
+//     console.error("Error loading tasks:", error);
+//   }
+// }
+
 async function fetchAndRenderTasks() {
   if (!token) {
     window.location.href = "/login.html";
@@ -88,9 +113,19 @@ async function fetchAndRenderTasks() {
     }
 
     const tasks = await response.json();
+
+    // ✅ Check if tasks array is empty or null
+    if (!tasks || tasks.length === 0) {
+      document.getElementById("tasks-list").innerHTML =
+        "<strong>No tasks available.</strong>";
+      return;
+    }
+
     renderTasks(tasks);
   } catch (error) {
     console.error("Error loading tasks:", error);
+    document.getElementById("tasks-list").innerHTML =
+      "<p>Error loading tasks. Please try again later.</p>";
   }
 }
 
@@ -107,7 +142,7 @@ async function addTask() {
   const member = groupData.members.find(
     (m) => m.name.toLowerCase() === memberName.toLowerCase()
   );
-  
+
   if (!member) {
     alert("Member not found in the group.");
     return;
@@ -135,7 +170,7 @@ async function addTask() {
     if (!response.ok) {
       throw new Error("Failed to add task");
     }
-    alert(`Task assigned to ${member.name} successfully`)
+    alert(`Task assigned to ${member.name} successfully`);
 
     fetchAndRenderTasks();
   } catch (error) {

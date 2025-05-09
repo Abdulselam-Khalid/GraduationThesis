@@ -1,4 +1,5 @@
 const token = sessionStorage.getItem("token");
+const userData = JSON.parse(sessionStorage.getItem("userData"));
 const deadlines = [
   { name: "Forms Due", date: "Apr 28" },
   { name: "Trash Day", date: "May 1" },
@@ -35,6 +36,13 @@ async function renderTasks() {
     }
 
     const tasks = await response.json();
+
+    // ✅ Check if tasks array is empty or null
+    if (!tasks || tasks.length === 0) {
+      document.getElementById("tasks-list").innerHTML =
+        "<strong>No tasks available.</strong>";
+      return;
+    }
     tasks.forEach((task) => {
       const li = document.createElement("li");
       li.innerHTML = `

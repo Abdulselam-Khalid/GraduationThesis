@@ -77,7 +77,7 @@ async function renderMembers(groups) {
       button.addEventListener("click", addMember);
     });
   }
-  if (userData.id != groupData.createdBy) {
+  if (userData.id != groups.createdBy) {
     if (!document.querySelector("#leave-group-button")) {
       const button = document.createElement("button");
       button.innerHTML = "Leave Group";
@@ -89,10 +89,10 @@ async function renderMembers(groups) {
         button.addEventListener("click", leaveGroup);
       });
     }
-    document.querySelectorAll("#remove-member").forEach((button) => {
-      button.addEventListener("click", removeMember);
-    });
   }
+  document.querySelectorAll("#remove-member").forEach((button) => {
+    button.addEventListener("click", removeMember);
+  });
 }
 function renderTasks(tasks) {
   const list = document.getElementById("tasks-list");
@@ -153,11 +153,57 @@ function renderTasks(tasks) {
   });
 }
 
+// async function fetchAndRenderTasks() {
+//   if (!token) {
+//     window.location.href = "/login.html";
+//     return;
+//   }
+//   try {
+//     let response = await fetch(`http://localhost:5000/api/groups`, {
+//       headers: {
+//         Authorization: `Bearer ${token}`,
+//         "Content-Type": "application/json",
+//       },
+//     });
+//     if (!response) {
+//       throw new Error("Failed to fetch group details");
+//     }
+//     const groups = await response.json();
+
+// // If no group found
+// if (!groups || Array.isArray(groups) && groups.length === 0) {
+//   document.getElementById("names-list").innerHTML = "<p>No group found. Please join or create a group.</p>";
+//   document.getElementById("tasks-list").innerHTML = "<p>No tasks to show.</p>";
+//   return;
+// }
+
+//     renderMembers(groups);
+//     response = await fetch(
+//       `http://localhost:5000/api/groups/${groups._id}/tasks`,
+//       {
+//         headers: {
+//           Authorization: `Bearer ${token}`,
+//           "Content-Type": "application/json",
+//         },
+//       }
+//     );
+
+//     if (!response.ok) {
+//       throw new Error("Failed to fetch tasks");
+//     }
+
+//     const tasks = await response.json();
+//     renderTasks(tasks);
+//   } catch (error) {
+//     console.error("Error loading tasks or members:", error);
+//   }
+// }
 async function fetchAndRenderTasks() {
   if (!token) {
     window.location.href = "/login.html";
     return;
   }
+
   try {
     let response = await fetch(`http://localhost:5000/api/groups`, {
       headers: {
@@ -165,11 +211,40 @@ async function fetchAndRenderTasks() {
         "Content-Type": "application/json",
       },
     });
-    if (!response) {
+
+    if (!response.ok) {
       throw new Error("Failed to fetch group details");
     }
+
     const groups = await response.json();
+
+    // ✅ Handle case where no groups exist
+    if (!groups || (Array.isArray(groups) && groups.length === 0)) {
+      document.getElementById("names-list").innerHTML =
+        "<p>No group found. Please join or create a group.</p>";
+      const createBtn = document.createElement("button");
+      createBtn.classList = "add-btn";
+      createBtn.id = "create-button";
+      createBtn.innerHTML = "Create Group";
+      document.querySelector(".names-card").appendChild(createBtn);
+      createBtn.addEventListener("click", () => {
+        console.log("Add Logic");
+      });
+      document.getElementById("tasks-list").innerHTML =
+        "<p>No tasks to show.</p>";
+      return;
+    }
+
+    // ✅ If your backend returns a single group object instead of an array
+    if (!groups._id) {
+      console.warn("No valid group ID found. Cannot fetch tasks.");
+      document.getElementById("tasks-list").innerHTML =
+        "<p>No group data available.</p>";
+      return;
+    }
+
     renderMembers(groups);
+
     response = await fetch(
       `http://localhost:5000/api/groups/${groups._id}/tasks`,
       {
@@ -188,7 +263,10 @@ async function fetchAndRenderTasks() {
     renderTasks(tasks);
   } catch (error) {
     console.error("Error loading tasks or members:", error);
-    noGroup()
+    document.getElementById("tasks-list").innerHTML =
+      "<p>Error loading tasks.</p>";
+    document.getElementById("names-list").innerHTML =
+      "<p>Error loading members.</p>";
   }
 }
 
@@ -227,6 +305,7 @@ async function addTask() {
         title: title,
         description: description,
         assignedTo: member._id,
+        groupId: groupData._id,
       }),
     });
 
@@ -237,7 +316,7 @@ async function addTask() {
     fetchAndRenderTasks();
   } catch (error) {
     console.error(error);
-    alert("Failed to add task. See console for details.");
+    alert("Failed to add task.");
   }
 }
 
@@ -287,11 +366,10 @@ const removeTask = async (e) => {
 };
 
 const leaveGroup = async (e) => {
-
   if (!confirm(`Are you sure you want to leave "${groupData.name}"?`)) return;
 
-  // You can now send both IDs to your backend:
   try {
+    // Call the API to remove the member and delete their tasks
     const response = await fetch(
       `http://localhost:5000/api/groups/${groupData._id}/members/${userData.id}`,
       {
@@ -304,16 +382,22 @@ const leaveGroup = async (e) => {
     );
 
     if (!response.ok) {
-      throw new Error("Failed to remove member");
+      throw new Error("Failed to remove member and delete tasks");
     }
-    alert(`You left "${groupData.name}"`)
-    await fetchAndRenderTasks(); // Refresh UI
-  } catch (error) {
-    console.error("Error removing member:", error);
-    alert(error);
-  }
 
+    alert(
+      `You have left "${groupData.name}" and your tasks have been deleted.`
+    );
+    const button = document.getElementById("leave-group-button");
+    button.remove();
+    // Refresh the tasks and members UI
+    await fetchAndRenderTasks(); // This should refresh the UI to reflect changes
+  } catch (error) {
+    console.error("Error removing member and deleting tasks:", error);
+    alert("Failed to leave the group.");
+  }
 };
+
 const removeMember = async (e) => {
   const memberId = e.target.dataset.id;
   const groupId = e.target.dataset.groupId;
@@ -385,16 +469,6 @@ async function addMember() {
     alert(`${error}`);
   }
 }
-const noGroup = () => {
-  const list = document.getElementById("names-list");
-  const taskList = document.getElementById("tasks-list");
-
-  const text = document.createElement("h4");
-  text.innerHTML = "Not a member of any group";
-
-  list.appendChild(text.cloneNode(true));
-  taskList.appendChild(text);
-};
 
 document.addEventListener("DOMContentLoaded", async () => {
   await fetchAndRenderTasks();
