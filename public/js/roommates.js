@@ -24,7 +24,9 @@ const groupData = JSON.parse(sessionStorage.getItem("groupData"));
 //   }
 // }
 
-async function renderMembers(groups) {
+const renderMembers = async (groups) => {
+  const crtBtn = document.getElementById("create-button");
+  if (crtBtn) crtBtn.remove();
   const list = document.getElementById("names-list");
   list.innerHTML = ""; // Clear the list before rendering
 
@@ -77,24 +79,24 @@ async function renderMembers(groups) {
       button.addEventListener("click", addMember);
     });
   }
-  if (userData.id != groups.createdBy) {
-    if (!document.querySelector("#leave-group-button")) {
-      const button = document.createElement("button");
-      button.innerHTML = "Leave Group";
-      button.classList = "leave-btn";
-      button.id = "leave-group-button";
-      const section = document.querySelector(".names-card");
-      section.appendChild(button);
-      document.querySelectorAll("#leave-group-button").forEach((button) => {
-        button.addEventListener("click", leaveGroup);
-      });
-    }
+
+  if (!document.querySelector("#leave-group-button")) {
+    const button = document.createElement("button");
+    button.innerHTML = "Leave Group";
+    button.classList = "leave-btn";
+    button.id = "leave-group-button";
+    const section = document.querySelector(".names-card");
+    section.appendChild(button);
+    document.querySelectorAll("#leave-group-button").forEach((button) => {
+      button.addEventListener("click", () => leaveGroup(groups));
+    });
   }
+
   document.querySelectorAll("#remove-member").forEach((button) => {
     button.addEventListener("click", removeMember);
   });
-}
-function renderTasks(tasks) {
+};
+const renderTasks = (tasks, groups) => {
   const list = document.getElementById("tasks-list");
   list.innerHTML = "";
 
@@ -121,7 +123,7 @@ function renderTasks(tasks) {
             : ""
         }
         ${
-          userData.id == groupData.createdBy
+          userData.id == groups.createdBy
             ? `<button data-id="${task._id}" id="remove-task" class="remove-btn">X</button>`
             : ""
         }
@@ -137,7 +139,7 @@ function renderTasks(tasks) {
     button.classList = "add-btn";
     button.id = "add-task-btn";
     const section = document.querySelector(".tasks-card");
-    if (groupData.createdBy == userData.id) {
+    if (groups.createdBy == userData.id) {
       section.appendChild(button);
       document.querySelectorAll("#add-task-btn").forEach((button) => {
         button.addEventListener("click", addTask);
@@ -151,7 +153,7 @@ function renderTasks(tasks) {
   document.querySelectorAll("#remove-task").forEach((button) => {
     button.addEventListener("click", removeTask);
   });
-}
+};
 
 // async function fetchAndRenderTasks() {
 //   if (!token) {
@@ -198,7 +200,7 @@ function renderTasks(tasks) {
 //     console.error("Error loading tasks or members:", error);
 //   }
 // }
-async function fetchAndRenderTasks() {
+const fetchAndRenderTasks = async () => {
   if (!token) {
     window.location.href = "/login.html";
     return;
@@ -227,19 +229,9 @@ async function fetchAndRenderTasks() {
       createBtn.id = "create-button";
       createBtn.innerHTML = "Create Group";
       document.querySelector(".names-card").appendChild(createBtn);
-      createBtn.addEventListener("click", () => {
-        console.log("Add Logic");
-      });
+      createBtn.addEventListener("click", createGroup);
       document.getElementById("tasks-list").innerHTML =
         "<p>No tasks to show.</p>";
-      return;
-    }
-
-    // ✅ If your backend returns a single group object instead of an array
-    if (!groups._id) {
-      console.warn("No valid group ID found. Cannot fetch tasks.");
-      document.getElementById("tasks-list").innerHTML =
-        "<p>No group data available.</p>";
       return;
     }
 
@@ -260,7 +252,7 @@ async function fetchAndRenderTasks() {
     }
 
     const tasks = await response.json();
-    renderTasks(tasks);
+    renderTasks(tasks, groups);
   } catch (error) {
     console.error("Error loading tasks or members:", error);
     document.getElementById("tasks-list").innerHTML =
@@ -268,9 +260,9 @@ async function fetchAndRenderTasks() {
     document.getElementById("names-list").innerHTML =
       "<p>Error loading members.</p>";
   }
-}
+};
 
-async function addTask() {
+const addTask = async () => {
   const title = prompt("Enter task title:");
   if (!title) return;
 
@@ -318,7 +310,7 @@ async function addTask() {
     console.error(error);
     alert("Failed to add task.");
   }
-}
+};
 
 const completeTask = async (e) => {
   const taskId = e.target.dataset.id;
@@ -359,19 +351,22 @@ const removeTask = async (e) => {
       throw new Error("Failed to delete task");
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
     alert("Could not remove task");
   }
   fetchAndRenderTasks();
 };
 
-const leaveGroup = async (e) => {
-  if (!confirm(`Are you sure you want to leave "${groupData.name}"?`)) return;
-
+const leaveGroup = async (groups) => {
+  if (groups.createdBy == userData.id) {
+    deleteGroup(groups);
+    return;
+  }
+  if (!confirm(`Are you sure you want to leave "${groups.name}"?`)) return;
   try {
     // Call the API to remove the member and delete their tasks
     const response = await fetch(
-      `http://localhost:5000/api/groups/${groupData._id}/members/${userData.id}`,
+      `http://localhost:5000/api/groups/${groups._id}/members/${userData.id}`,
       {
         method: "DELETE",
         headers: {
@@ -385,11 +380,9 @@ const leaveGroup = async (e) => {
       throw new Error("Failed to remove member and delete tasks");
     }
 
-    alert(
-      `You have left "${groupData.name}" and your tasks have been deleted.`
-    );
-    const button = document.getElementById("leave-group-button");
-    button.remove();
+    alert(`You have left "${groups.name}" and your tasks have been deleted.`);
+    document.getElementById("leave-group-button").remove();
+    document.getElementById("add-roommate-button") ? document.getElementById("add-roommate-button").remove() : ''
     // Refresh the tasks and members UI
     await fetchAndRenderTasks(); // This should refresh the UI to reflect changes
   } catch (error) {
@@ -397,7 +390,36 @@ const leaveGroup = async (e) => {
     alert("Failed to leave the group.");
   }
 };
+const deleteGroup = async (groups) => {
+  if (
+    !confirm(
+      "As an admin, leaving the group will mean the termination of the group. Are you sure you want to leave the group?"
+    )
+  )
+    return;
 
+  try {
+    const response = await fetch(
+      `http://localhost:5000/api/groups/${groups._id}`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to delete group");
+    }
+    alert(`You have left "${groups.name}" and the group has been deleted.`);
+    document.getElementById("leave-group-button").remove();
+    document.getElementById("add-roommate-button").remove();
+    fetchAndRenderTasks();
+  } catch (error) {
+    console.error({ error });
+  }
+};
 const removeMember = async (e) => {
   const memberId = e.target.dataset.id;
   const groupId = e.target.dataset.groupId;
@@ -427,7 +449,7 @@ const removeMember = async (e) => {
     alert("Could not remove the member.");
   }
 };
-async function addMember() {
+const addMember = async () => {
   const email = prompt("Enter the email of the member to add:");
   if (!email) return;
 
@@ -468,8 +490,29 @@ async function addMember() {
     console.error("Error adding member:", error);
     alert(`${error}`);
   }
-}
-
+};
+const createGroup = async () => {
+  const name = prompt("Please enter name of the group:");
+  if (!name) return;
+  try {
+    const response = await fetch("http://localhost:5000/api/groups", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: name,
+      }),
+    });
+    if (!response.ok) {
+      alert("Failed to create group!");
+    }
+    await fetchAndRenderTasks();
+  } catch (error) {
+    console.error(error);
+  }
+};
 document.addEventListener("DOMContentLoaded", async () => {
   await fetchAndRenderTasks();
 });

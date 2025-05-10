@@ -434,6 +434,7 @@ body {
 }
 .leave-btn{
   border-radius: 6px;
+  margin-top: 10px;
 }
 .remove-btn:hover, .leave-btn:hover {
   background-color: hsl(0, 100%, 40%);

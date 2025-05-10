@@ -1,4 +1,4 @@
 Roommie (To-Do-List)
 
-1. Create group logic for users without groups
+1. Start the financial side of the website
 2. 

@@ -57,7 +57,7 @@ function renderTasks(tasks) {
           });
         }
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     })();
   // ✅ Attach event listeners AFTER rendering all tasks
@@ -218,7 +218,7 @@ const removeTask = async (e) => {
       throw new Error("Failed to delete task");
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
     alert("Could not remove task");
   }
   fetchAndRenderTasks();

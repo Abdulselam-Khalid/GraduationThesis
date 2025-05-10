@@ -4,15 +4,34 @@ const Group = require("../models/Groups");
 const User = require("../models/User")
 
 const getMembers = async (req, res) => {
-    const userID = req.userID
+    const userId = req.userID
   try {
     
-    const group = await Group.findOne({members:userID}).populate("members", "name email")
+    const group = await Group.findOne({members:userId}).populate("members", "name email")
     res.status(200).json(group)
-  } catch (err) {
-    res.status(500).json({error:err.message})
+  } catch (erorr) {
+    res.status(500).json({error:error.message})
   }
 };
+const createGroup = async (req, res) => {
+  const userId = req.userID
+  const {name} = req.body
+  
+  try {
+    const existingGroup = await Group.findOne({ members: userId });
+if (existingGroup) {
+  throw new Error("User already has a group");
+}
+      const group = await Group.create({
+      name,
+      members:[userId],
+      createdBy:userId
+    })
+    res.status(201).json(group)
+  } catch (error) {
+    res.status(500).json({error:error.message})
+  }
+}
 // const getGroupTasks = async (req, res) => {
 //   const groupId = req.params.groupId;
 
@@ -45,8 +64,8 @@ const removeMember = async (req, res) => {
   try {
     const group = await Group.findByIdAndUpdate(
       groupId,
-      { $pull: { members: memberId } }, // This removes memberId from members array
-      { new: true } // Returns the updated group
+      { $pull: { members: memberId } }, 
+      { new: true } 
     );
 
     if (!group) {
@@ -93,5 +112,17 @@ const addMember = async (req, res) => {
   }
 };
 
+const deleteGroup = async (req, res) => {
+  const {groupId} = req.params
+  try {
+    const response = await Group.findOneAndDelete({_id:groupId})
+    if(!response){
+      return res.status(404).json({message:'Group not found'})
+    }
+    res.status(200).json({message:'successfully'})
+  } catch (error) {
+    res.status(500).json({error:error.message})
+  }
+}
 
-module.exports = {getMembers, getGroupTasks, removeMember, addMember}
+module.exports = {getMembers, createGroup, getGroupTasks, removeMember, addMember, deleteGroup}
