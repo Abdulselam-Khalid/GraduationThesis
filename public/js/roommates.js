@@ -75,7 +75,7 @@ const renderMembers = async (groups) => {
     if (groups.createdBy == userData.id) {
       section.appendChild(button);
     }
-    document.querySelectorAll(".add-btn").forEach((button) => {
+    document.querySelectorAll("#add-roommate-button").forEach((button) => {
       button.addEventListener("click", addMember);
     });
   }
@@ -110,16 +110,21 @@ const renderTasks = (tasks, groups) => {
           } />
           <strong>${task.title}</strong><br />
           <p>${task.description || ""}</p>
-          <small>Assigned to: ${task.assignedTo.name || ""}</small>
-        </span>
-        <span>
+          <p>Assigned to: <b>${task.assignedTo.name || ""}</b></p>
+          </span>
+          <span>
+          ${
+            !task.completed
+              ? `<strong>${formatDate(task.dueDate) || ""}</strong>`
+              : "<strong>Done  </strong>"
+          }
         ${
           task.assignedTo.name == userData.name
-            ? `<button data-id="${task._id}" ${
-                task.completed === true
-                  ? 'class="finished-task-btn"'
-                  : 'class="completed-task-btn"'
-              }>${task.completed === true ? "Completed" : "Complete"}</button>`
+            ? `${
+                task.completed === false
+                  ? `<button data-id="${task._id}" class="completed-task-btn">Complete</button>`
+                  : ""
+              }`
             : ""
         }
         ${
@@ -141,9 +146,10 @@ const renderTasks = (tasks, groups) => {
     const section = document.querySelector(".tasks-card");
     if (groups.createdBy == userData.id) {
       section.appendChild(button);
-      document.querySelectorAll("#add-task-btn").forEach((button) => {
-        button.addEventListener("click", addTask);
-      });
+      const addTaskBtn = document.querySelector("#add-task-btn");
+      addTaskBtn
+        ? addTaskBtn.addEventListener("click", () => openModal("addTaskModal"))
+        : ``;
     }
   }
   // ✅ Attach event listeners AFTER rendering all tasks
@@ -219,6 +225,7 @@ const fetchAndRenderTasks = async () => {
     }
 
     const groups = await response.json();
+    sessionStorage.setItem("groupData", JSON.stringify(groups));
 
     // ✅ Handle case where no groups exist
     if (!groups || (Array.isArray(groups) && groups.length === 0)) {
@@ -262,16 +269,7 @@ const fetchAndRenderTasks = async () => {
   }
 };
 
-const addTask = async () => {
-  const title = prompt("Enter task title:");
-  if (!title) return;
-
-  const description = prompt("Enter task description:");
-  if (!description) return;
-
-  const memberName = prompt("Enter member name:");
-  if (!memberName) return;
-
+const addTask = async (title, description, memberName, dueDate) => {
   const member = groupData.members.find(
     (m) => m.name.toLowerCase() === memberName.toLowerCase()
   );
@@ -285,6 +283,16 @@ const addTask = async () => {
     alert("You must be logged in to add a task.");
     return;
   }
+  let taskData = {
+    title: title,
+    description: description,
+    assignedTo: member._id,
+    groupId: groupData._id,
+  };
+
+  if (dueDate) {
+    taskData.dueDate = dueDate;
+  }
 
   try {
     let response = await fetch("http://localhost:5000/api/tasks", {
@@ -293,12 +301,7 @@ const addTask = async () => {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        title: title,
-        description: description,
-        assignedTo: member._id,
-        groupId: groupData._id,
-      }),
+      body: JSON.stringify(taskData),
     });
 
     if (!response.ok) {
@@ -382,7 +385,9 @@ const leaveGroup = async (groups) => {
 
     alert(`You have left "${groups.name}" and your tasks have been deleted.`);
     document.getElementById("leave-group-button").remove();
-    document.getElementById("add-roommate-button") ? document.getElementById("add-roommate-button").remove() : ''
+    document.getElementById("add-roommate-button")
+      ? document.getElementById("add-roommate-button").remove()
+      : "";
     // Refresh the tasks and members UI
     await fetchAndRenderTasks(); // This should refresh the UI to reflect changes
   } catch (error) {
@@ -513,6 +518,70 @@ const createGroup = async () => {
     console.error(error);
   }
 };
+const formatDate = (dueDate) => {
+  if (!dueDate) return;
+  const formattedDate = new Date(dueDate).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+  return formattedDate;
+};
+function openModal(modalId) {
+  document.getElementById(modalId).style.display = "block";
+}
+
+function closeModal(modalId) {
+  document.getElementById(modalId).style.display = "none";
+}
+
+function submitNewRoommate() {
+  const name = document.getElementById("newRoommateName").value.trim();
+  if (!name) {
+    alert("Please enter a name.");
+    return;
+  }
+
+  const li = document.createElement("li");
+  li.textContent = name;
+
+  document.getElementById("roommateList").appendChild(li);
+  document.getElementById("newRoommateName").value = "";
+  closeModal("addRoommateModal");
+}
+
+function submitNewTask() {
+  const title = document.getElementById("taskTitle").value.trim();
+  const description = document.getElementById("taskDescription").value.trim();
+  const memberName = document.getElementById("taskAssignee").value.trim();
+  let dueDate = "";
+  dueDate = document.getElementById("taskDeadline").value;
+
+  if (!title || !description || !memberName) {
+    alert("Please fill in all fields.");
+    return;
+  }
+
+  addTask(title, description, memberName, dueDate);
+
+  // Reset modal inputs
+  document.getElementById("taskTitle").value = "";
+  document.getElementById("taskDescription").value = "";
+  document.getElementById("taskAssignee").value = "";
+  document.getElementById("taskDeadline").value = "";
+
+  closeModal("addTaskModal");
+}
+
+// Close modals if user clicks outside content
+window.onclick = function (event) {
+  const addRoommateModal = document.getElementById("addRoommateModal");
+  const addTaskModal = document.getElementById("addTaskModal");
+
+  if (event.target === addRoommateModal) closeModal("addRoommateModal");
+  if (event.target === addTaskModal) closeModal("addTaskModal");
+};
+
 document.addEventListener("DOMContentLoaded", async () => {
   await fetchAndRenderTasks();
 });

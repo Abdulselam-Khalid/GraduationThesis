@@ -1,4 +1,4 @@
 Roommie (To-Do-List)
 
-1. Start the financial side of the website
-2. 
+1. Integrate modals to the add member function
+2. Start the financial side of the website

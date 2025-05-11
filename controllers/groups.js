@@ -119,6 +119,10 @@ const deleteGroup = async (req, res) => {
     if(!response){
       return res.status(404).json({message:'Group not found'})
     }
+    const task = await Task.deleteMany({groupId:groupId})
+    if(!task){
+      return res.status(404).json({message: 'Task not found'})
+    }
     res.status(200).json({message:'successfully'})
   } catch (error) {
     res.status(500).json({error:error.message})

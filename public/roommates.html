@@ -58,6 +58,29 @@
         
       </div>
     </div>
+    <!-- Add Roommate Modal -->
+<div id="addRoommateModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal('addRoommateModal')">&times;</span>
+    <h3>Add Roommate</h3>
+    <input class="primaryInput focus" type="text" id="newRoommateName" placeholder="Enter name" />
+    <button onclick="submitNewRoommate()">Add</button>
+  </div>
+</div>
+
+<!-- Add Task Modal -->
+<div id="addTaskModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal('addTaskModal')">&times;</span>
+    <h3>Add Task</h3>
+    <input type="text" class="primaryInput focus" id="taskTitle" placeholder="Task title" />
+    <input type="text" class="primaryInput focus" id="taskDescription" placeholder="Task description" />
+    <input type="text" class="primaryInput focus" id="taskAssignee" placeholder="Assign to" />
+    <input type="date" class="primaryInput focus" id="taskDeadline" />
+    <button class="add-btn" onclick="submitNewTask()">Add Task</button>
+  </div>
+</div>
+
 
     <!-- Load dashboard script after DOM is ready -->
     

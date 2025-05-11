@@ -20,8 +20,9 @@ const TaskSchema = new mongoose.Schema({
     required:[true, 'User must be a member of a group']
   },
   dueDate: {
-    type: Date,
-  },
+      type: Date,
+      default: () => new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // 5 days from now
+    },
   completed: {
     type: Boolean,
     default: false,
