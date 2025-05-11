@@ -1,4 +1,6 @@
 Roommie (To-Do-List)
 
-1. Integrate modals to the add member function
+1. Adjust due date
 2. Start the financial side of the website
+3. Drop down menu for members while adding tasks
+4. 

@@ -76,7 +76,7 @@ const renderMembers = async (groups) => {
       section.appendChild(button);
     }
     document.querySelectorAll("#add-roommate-button").forEach((button) => {
-      button.addEventListener("click", addMember);
+      button.addEventListener("click", () => openModal("addRoommateModal"));
     });
   }
 
@@ -88,13 +88,39 @@ const renderMembers = async (groups) => {
     const section = document.querySelector(".names-card");
     section.appendChild(button);
     document.querySelectorAll("#leave-group-button").forEach((button) => {
-      button.addEventListener("click", () => leaveGroup(groups));
+      button.addEventListener("click", () => {
+    openModal("confirmModal");
+    document.getElementById("confirmHeader").textContent = `Confirm`
+    document.getElementById("confirmMessage").textContent = `Are you sure you want to leave "${groups.name}"?`
+    const confirmYes = document.getElementById("confirmYes");
+    const confirmNo = document.getElementById("confirmNo");
+
+    // Remove previous event listeners to prevent duplication
+    confirmYes.replaceWith(confirmYes.cloneNode(true));
+    confirmNo.replaceWith(confirmNo.cloneNode(true));
+
+    document.getElementById("confirmYes").addEventListener("click", () => leaveGroup(groups));
+    document.getElementById("confirmNo").addEventListener("click", () => closeModal("confirmModal"));
+  });
     });
   }
 
   document.querySelectorAll("#remove-member").forEach((button) => {
-    button.addEventListener("click", removeMember);
+  button.addEventListener("click", (e) => {
+    openModal("confirmModal");
+    document.getElementById("confirmHeader").textContent = `Confirm`
+    document.getElementById("confirmMessage").textContent = `Are you sure you want to remove this member?`
+    const confirmYes = document.getElementById("confirmYes");
+    const confirmNo = document.getElementById("confirmNo");
+
+    // Remove previous event listeners to prevent duplication
+    confirmYes.replaceWith(confirmYes.cloneNode(true));
+    confirmNo.replaceWith(confirmNo.cloneNode(true));
+
+    document.getElementById("confirmYes").addEventListener("click", () => removeMember(e));
+    document.getElementById("confirmNo").addEventListener("click", () => closeModal("confirmModal"));
   });
+});
 };
 const renderTasks = (tasks, groups) => {
   const list = document.getElementById("tasks-list");
@@ -157,8 +183,21 @@ const renderTasks = (tasks, groups) => {
     button.addEventListener("click", completeTask);
   });
   document.querySelectorAll("#remove-task").forEach((button) => {
-    button.addEventListener("click", removeTask);
+  button.addEventListener("click", (e) => {
+    openModal("confirmModal");
+    document.getElementById("confirmHeader").textContent = `Confirm`
+    document.getElementById("confirmMessage").textContent = `Are you sure you want to remove this task?`
+    const confirmYes = document.getElementById("confirmYes");
+    const confirmNo = document.getElementById("confirmNo");
+
+    // Remove previous event listeners to prevent duplication
+    confirmYes.replaceWith(confirmYes.cloneNode(true));
+    confirmNo.replaceWith(confirmNo.cloneNode(true));
+
+    document.getElementById("confirmYes").addEventListener("click", () => removeTask(e));
+    document.getElementById("confirmNo").addEventListener("click", () => closeModal("confirmModal"));
   });
+});
 };
 
 // async function fetchAndRenderTasks() {
@@ -236,7 +275,7 @@ const fetchAndRenderTasks = async () => {
       createBtn.id = "create-button";
       createBtn.innerHTML = "Create Group";
       document.querySelector(".names-card").appendChild(createBtn);
-      createBtn.addEventListener("click", createGroup);
+      createBtn.addEventListener("click", () => openModal('createGroupModal'));
       document.getElementById("tasks-list").innerHTML =
         "<p>No tasks to show.</p>";
       return;
@@ -357,12 +396,25 @@ const removeTask = async (e) => {
     console.error(error);
     alert("Could not remove task");
   }
+  closeModal("confirmModal")
   fetchAndRenderTasks();
 };
 
 const leaveGroup = async (groups) => {
   if (groups.createdBy == userData.id) {
-    deleteGroup(groups);
+    
+    document.getElementById("confirmHeader").textContent = `Alert`
+    document.getElementById("confirmMessage").textContent = `As an admin, leaving the group will mean the termination of the group. Are you sure you want to leave the group?`
+    const confirmYes = document.getElementById("confirmYes");
+    const confirmNo = document.getElementById("confirmNo");
+
+    // Remove previous event listeners to prevent duplication
+    confirmYes.replaceWith(confirmYes.cloneNode(true));
+    confirmNo.replaceWith(confirmNo.cloneNode(true));
+
+    document.getElementById("confirmYes").addEventListener("click", () => deleteGroup(groups));
+    document.getElementById("confirmNo").addEventListener("click", () => closeModal("confirmModal"));
+    
     return;
   }
   if (!confirm(`Are you sure you want to leave "${groups.name}"?`)) return;
@@ -388,6 +440,7 @@ const leaveGroup = async (groups) => {
     document.getElementById("add-roommate-button")
       ? document.getElementById("add-roommate-button").remove()
       : "";
+    closeModal("confirmModal")
     // Refresh the tasks and members UI
     await fetchAndRenderTasks(); // This should refresh the UI to reflect changes
   } catch (error) {
@@ -396,12 +449,6 @@ const leaveGroup = async (groups) => {
   }
 };
 const deleteGroup = async (groups) => {
-  if (
-    !confirm(
-      "As an admin, leaving the group will mean the termination of the group. Are you sure you want to leave the group?"
-    )
-  )
-    return;
 
   try {
     const response = await fetch(
@@ -420,6 +467,8 @@ const deleteGroup = async (groups) => {
     alert(`You have left "${groups.name}" and the group has been deleted.`);
     document.getElementById("leave-group-button").remove();
     document.getElementById("add-roommate-button").remove();
+    document.getElementById("add-task-btn").remove();
+    closeModal("confirmModal")
     fetchAndRenderTasks();
   } catch (error) {
     console.error({ error });
@@ -428,8 +477,6 @@ const deleteGroup = async (groups) => {
 const removeMember = async (e) => {
   const memberId = e.target.dataset.id;
   const groupId = e.target.dataset.groupId;
-
-  if (!confirm("Are you sure you want to remove this member?")) return;
 
   // You can now send both IDs to your backend:
   try {
@@ -447,15 +494,14 @@ const removeMember = async (e) => {
     if (!response.ok) {
       throw new Error("Failed to remove member");
     }
-
+    closeModal("confirmModal")
     await fetchAndRenderTasks(); // Refresh UI
   } catch (error) {
     console.error("Error removing member:", error);
     alert("Could not remove the member.");
   }
 };
-const addMember = async () => {
-  const email = prompt("Enter the email of the member to add:");
+const addMember = async (email) => {
   if (!email) return;
 
   try {
@@ -496,9 +542,8 @@ const addMember = async () => {
     alert(`${error}`);
   }
 };
-const createGroup = async () => {
-  const name = prompt("Please enter name of the group:");
-  if (!name) return;
+const createGroup = async (name) => {
+  
   try {
     const response = await fetch("http://localhost:5000/api/groups", {
       method: "POST",
@@ -527,26 +572,26 @@ const formatDate = (dueDate) => {
   });
   return formattedDate;
 };
-function openModal(modalId) {
-  document.getElementById(modalId).style.display = "block";
-}
 
-function closeModal(modalId) {
-  document.getElementById(modalId).style.display = "none";
+const submitNewGroup = () => {
+  const name = document.getElementById("newGroupName").value.trim()
+  if(!name){
+    alert("Please enter a name.")
+    return
+  }
+  createGroup(name)
+  document.getElementById("newGroupName").value = ''
+  closeModal('createGroupModal')
 }
 
 function submitNewRoommate() {
-  const name = document.getElementById("newRoommateName").value.trim();
-  if (!name) {
-    alert("Please enter a name.");
+  const email = document.getElementById("newRoommateEmail").value.trim();
+  if (!email) {
+    alert("Please enter an email.");
     return;
   }
-
-  const li = document.createElement("li");
-  li.textContent = name;
-
-  document.getElementById("roommateList").appendChild(li);
-  document.getElementById("newRoommateName").value = "";
+  addMember(email);
+  document.getElementById("newRoommateEmail").value = "";
   closeModal("addRoommateModal");
 }
 
@@ -574,13 +619,7 @@ function submitNewTask() {
 }
 
 // Close modals if user clicks outside content
-window.onclick = function (event) {
-  const addRoommateModal = document.getElementById("addRoommateModal");
-  const addTaskModal = document.getElementById("addTaskModal");
 
-  if (event.target === addRoommateModal) closeModal("addRoommateModal");
-  if (event.target === addTaskModal) closeModal("addTaskModal");
-};
 
 document.addEventListener("DOMContentLoaded", async () => {
   await fetchAndRenderTasks();
