@@ -1,10 +1,15 @@
 const token = sessionStorage.getItem("token");
 const userData = JSON.parse(sessionStorage.getItem("userData"));
 const groupData = JSON.parse(sessionStorage.getItem("groupData"));
-function renderTasks(tasks) {
+
+const renderTasks = (tasks) => {
   const list = document.getElementById("tasks-list");
   list.innerHTML = "";
-
+  // ✅ Check if tasks array is empty or null
+  if (!tasks || tasks.length === 0) {
+    document.getElementById("tasks-list").innerHTML =
+      "<strong>No tasks available.</strong>";
+  }
   tasks.forEach((task) => {
     const li = document.createElement("li");
 
@@ -16,12 +21,16 @@ function renderTasks(tasks) {
           <strong>${task.title}</strong><br />
           <small>${task.description || ""}</small>
         </span>
-        <span>
-          <button data-id="${task._id}" ${
-      task.completed === true
-        ? 'class="finished-task-btn"'
-        : 'class="completed-task-btn"'
-    }>${task.completed === true ? "Completed" : "Complete"}</button>
+        <span>${
+          !task.completed
+            ? `<strong>${formatDate(task.dueDate) || ""}</strong>`
+            : "<strong>Done  </strong>"
+        }
+          ${
+            task.completed === false
+              ? `<button data-id="${task._id}" class="completed-task-btn">Complete</button>`
+              : ""
+          }
     ${
       userData.id == groupData.createdBy
         ? `<button data-id="${task._id}" id="remove-task" class="remove-btn">X</button>`
@@ -53,7 +62,9 @@ function renderTasks(tasks) {
         if (group.createdBy == userData.id) {
           section.appendChild(button);
           document.querySelectorAll("#add-task-btn").forEach((button) => {
-            button.addEventListener("click", addTask);
+            button.addEventListener("click", () => {
+              openModal("addTaskModal");
+            });
           });
         }
       } catch (error) {
@@ -65,36 +76,29 @@ function renderTasks(tasks) {
     button.addEventListener("click", completeTask);
   });
   document.querySelectorAll("#remove-task").forEach((button) => {
-    button.addEventListener("click", removeTask);
+    button.addEventListener("click", (e) => {
+      openModal("confirmModal");
+      document.getElementById("confirmHeader").textContent = `Confirm`;
+      document.getElementById(
+        "confirmMessage"
+      ).textContent = `Are you sure you want to remove this task?`;
+      const confirmYes = document.getElementById("confirmYes");
+      const confirmNo = document.getElementById("confirmNo");
+
+      // Remove previous event listeners to prevent duplication
+      confirmYes.replaceWith(confirmYes.cloneNode(true));
+      confirmNo.replaceWith(confirmNo.cloneNode(true));
+
+      document
+        .getElementById("confirmYes")
+        .addEventListener("click", () => removeTask(e));
+      document
+        .getElementById("confirmNo")
+        .addEventListener("click", () => closeModal("confirmModal"));
+    });
   });
-}
-
-// async function fetchAndRenderTasks() {
-//   if (!token) {
-//     window.location.href = "/login.html";
-//     return;
-//   }
-
-//   try {
-//     const response = await fetch("http://localhost:5000/api/tasks", {
-//       headers: {
-//         Authorization: `Bearer ${token}`,
-//         "Content-Type": "application/json",
-//       },
-//     });
-
-//     if (!response.ok) {
-//       throw new Error("Failed to fetch tasks");
-//     }
-
-//     const tasks = await response.json();
-//     renderTasks(tasks);
-//   } catch (error) {
-//     console.error("Error loading tasks:", error);
-//   }
-// }
-
-async function fetchAndRenderTasks() {
+};
+const fetchAndRender = async () => {
   if (!token) {
     window.location.href = "/login.html";
     return;
@@ -114,72 +118,50 @@ async function fetchAndRenderTasks() {
 
     const tasks = await response.json();
 
-    // ✅ Check if tasks array is empty or null
-    if (!tasks || tasks.length === 0) {
-      document.getElementById("tasks-list").innerHTML =
-        "<strong>No tasks available.</strong>";
-      return;
-    }
-
     renderTasks(tasks);
   } catch (error) {
     console.error("Error loading tasks:", error);
     document.getElementById("tasks-list").innerHTML =
       "<p>Error loading tasks. Please try again later.</p>";
   }
-}
-
-async function addTask() {
-  const title = prompt("Enter task title:");
-  if (!title) return;
-
-  const description = prompt("Enter task description:");
-  if (!description) return;
-
-  const memberName = prompt("Enter member name:");
-  if (!memberName) return;
-
-  const member = groupData.members.find(
-    (m) => m.name.toLowerCase() === memberName.toLowerCase()
-  );
-
-  if (!member) {
-    alert("Member not found in the group.");
-    return;
-  }
-
+};
+const addTask = async (title, description, dueDate) => {
   if (!token) {
     alert("You must be logged in to add a task.");
     return;
   }
+  let taskData = {
+    title: title,
+    description: description,
+    assignedTo: userData.id,
+    groupId: groupData._id,
+  };
+  console.log(taskData);
+
+  if (dueDate) {
+    taskData.dueDate = dueDate;
+  }
 
   try {
-    const response = await fetch("http://localhost:5000/api/tasks", {
+    let response = await fetch("http://localhost:5000/api/tasks", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        title: title,
-        description: description,
-        assignedTo: member._id,
-      }),
+      body: JSON.stringify(taskData),
     });
 
     if (!response.ok) {
       throw new Error("Failed to add task");
     }
-    alert(`Task assigned to ${member.name} successfully`);
-
-    fetchAndRenderTasks();
+    alert(`Task assigned successfully`);
+    fetchAndRender();
   } catch (error) {
     console.error(error);
-    alert("Failed to add task. See console for details.");
+    alert("Failed to add task.");
   }
-}
-
-// ✅ Updated completeTask function
+};
 const completeTask = async (e) => {
   const taskId = e.target.dataset.id;
 
@@ -197,7 +179,7 @@ const completeTask = async (e) => {
       throw new Error("Failed to mark task as complete");
     }
 
-    fetchAndRenderTasks(); // Refresh task list
+    fetchAndRender(); // Refresh task list
   } catch (error) {
     console.error("Error completing task:", error);
     alert("Could not complete the task.");
@@ -205,7 +187,6 @@ const completeTask = async (e) => {
 };
 const removeTask = async (e) => {
   const taskId = e.target.dataset.id;
-  if (!confirm("Are you sure you want to remove this task?")) return;
   try {
     const response = await fetch(`http://localhost:5000/api/tasks/${taskId}`, {
       method: "DELETE",
@@ -221,8 +202,29 @@ const removeTask = async (e) => {
     console.error(error);
     alert("Could not remove task");
   }
-  fetchAndRenderTasks();
+  closeModal("confirmModal");
+  fetchAndRender();
 };
+const submitNewTask = () => {
+  const title = document.getElementById("taskTitle").value.trim();
+  const description = document.getElementById("taskDescription").value.trim();
+  let dueDate = "";
+  dueDate = document.getElementById("taskDeadline").value;
+
+  if (!title || !description) {
+    alert("Please fill in all fields.");
+    return;
+  }
+
+  addTask(title, description, dueDate);
+
+  // Reset modal inputs
+  document.getElementById("taskTitle").value = "";
+  document.getElementById("taskDescription").value = "";
+  document.getElementById("taskDeadline").value = "";
+  closeModal("addTaskModal");
+};
+
 document.addEventListener("DOMContentLoaded", async () => {
-  await fetchAndRenderTasks();
+  await fetchAndRender();
 });

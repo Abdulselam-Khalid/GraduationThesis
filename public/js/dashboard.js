@@ -112,15 +112,9 @@ function renderNotifications() {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
-  await renderTasks();
+  renderTasks();
   renderDeadlines();
   renderActivities();
   renderExpenses();
   renderNotifications();
-
-  // const usernameElement = document.querySelector(".profile-name");
-  // let userName = sessionStorage.getItem("userName");
-  // userName = userName.replace(/"/g, "");
-  // userName = userName.slice(0, 1) + userName.slice(1);
-  // usernameElement.innerHTML = userName;
 });

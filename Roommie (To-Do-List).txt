@@ -1,6 +1,5 @@
 Roommie (To-Do-List)
 
-1. Adjust due date
-2. Start the financial side of the website
-3. Drop down menu for members while adding tasks
-4. 
+Fetch and render function in dashboard.js
+Upcoming deadlines in dashboard page
+Start the financial side of the website

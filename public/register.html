@@ -6,7 +6,7 @@
     <title>Register - Roomie Task Manager</title>
     <link rel="stylesheet" href="/css/styles.css" />
   </head>
-  <body>
+  <body class="login-body">
     <div class="LoginCard">
       <img class="faceavatar" src="/assets/logo.png" alt="Logo" />
       <h2>Create your Roomie account</h2>
@@ -32,13 +32,6 @@
           placeholder="Password"
           required
         />
-        <input
-          id="confirmPassword"
-          type="password"
-          class="primaryInput focus"
-          placeholder="Confirm Password"
-          required
-        />
         <p id="errorMessage" class="error-message" style="display: none"></p>
         <a href="/login.html" tabindex="-1">
           <small>Already have an account? Login</small>
@@ -49,53 +42,5 @@
       </form>
     </div>
     <script src="/js/auth.js"></script>
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        const registerForm = document.getElementById("registerForm");
-        const errorMessage = document.getElementById("errorMessage");
-
-        registerForm.addEventListener("submit", async function (e) {
-          e.preventDefault();
-
-          const name = document.getElementById("name").value;
-          const email = document.getElementById("email").value;
-          const password = document.getElementById("password").value;
-          const confirmPassword =
-            document.getElementById("confirmPassword").value;
-
-          // Validate passwords match
-          if (password !== confirmPassword) {
-            errorMessage.textContent = "Passwords do not match";
-            errorMessage.style.display = "block";
-            return;
-          }
-
-          try {
-            const response = await fetch(
-              "http://localhost:5000/api/auth/register",
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ name, email, password }),
-              }
-            );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-              throw new Error(data.message || "Registration failed");
-            }
-
-            // Registration successful, redirect to login
-            window.location.href = "/login.html";
-          } catch (error) {
-            errorMessage.textContent = error.message;
-            errorMessage.style.display = "block";
-          }
-        });
-      });
-    </script>
   </body>
 </html>

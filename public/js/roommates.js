@@ -2,28 +2,6 @@ const token = sessionStorage.getItem("token");
 const userData = JSON.parse(sessionStorage.getItem("userData"));
 const groupData = JSON.parse(sessionStorage.getItem("groupData"));
 
-// async function renderMembers(groups) {
-//   const list = document.getElementById("names-list");
-//   list.innerHTML = ""; // Clear the list before rendering
-
-//   // Loop through each group
-//   for (const group of groups) {
-//     const groupLi = document.createElement("li");
-//     groupLi.classList.add('group-li'); // Add a class to style the group
-//     groupLi.innerHTML = `<h3>${group.name}</h3><br>`;
-
-//     // Loop through each member and add their name
-//     group.members.forEach((member) => {
-//       const memberLi = document.createElement("li");
-//       memberLi.classList.add('member-li'); // Add a class to style the member
-//       memberLi.innerHTML = `<p>${member.name}</p>`;
-//       groupLi.appendChild(memberLi); // Add the member name as a sublist under the group
-//     });
-
-//     list.appendChild(groupLi); // Add the group (with all members) to the list
-//   }
-// }
-
 const renderMembers = async (groups) => {
   const crtBtn = document.getElementById("create-button");
   if (crtBtn) crtBtn.remove();
@@ -89,38 +67,50 @@ const renderMembers = async (groups) => {
     section.appendChild(button);
     document.querySelectorAll("#leave-group-button").forEach((button) => {
       button.addEventListener("click", () => {
-    openModal("confirmModal");
-    document.getElementById("confirmHeader").textContent = `Confirm`
-    document.getElementById("confirmMessage").textContent = `Are you sure you want to leave "${groups.name}"?`
-    const confirmYes = document.getElementById("confirmYes");
-    const confirmNo = document.getElementById("confirmNo");
+        openModal("confirmModal");
+        document.getElementById("confirmHeader").textContent = `Confirm`;
+        document.getElementById(
+          "confirmMessage"
+        ).textContent = `Are you sure you want to leave "${groups.name}"?`;
+        const confirmYes = document.getElementById("confirmYes");
+        const confirmNo = document.getElementById("confirmNo");
 
-    // Remove previous event listeners to prevent duplication
-    confirmYes.replaceWith(confirmYes.cloneNode(true));
-    confirmNo.replaceWith(confirmNo.cloneNode(true));
+        // Remove previous event listeners to prevent duplication
+        confirmYes.replaceWith(confirmYes.cloneNode(true));
+        confirmNo.replaceWith(confirmNo.cloneNode(true));
 
-    document.getElementById("confirmYes").addEventListener("click", () => leaveGroup(groups));
-    document.getElementById("confirmNo").addEventListener("click", () => closeModal("confirmModal"));
-  });
+        document
+          .getElementById("confirmYes")
+          .addEventListener("click", () => leaveGroup(groups));
+        document
+          .getElementById("confirmNo")
+          .addEventListener("click", () => closeModal("confirmModal"));
+      });
     });
   }
 
   document.querySelectorAll("#remove-member").forEach((button) => {
-  button.addEventListener("click", (e) => {
-    openModal("confirmModal");
-    document.getElementById("confirmHeader").textContent = `Confirm`
-    document.getElementById("confirmMessage").textContent = `Are you sure you want to remove this member?`
-    const confirmYes = document.getElementById("confirmYes");
-    const confirmNo = document.getElementById("confirmNo");
+    button.addEventListener("click", (e) => {
+      openModal("confirmModal");
+      document.getElementById("confirmHeader").textContent = `Confirm`;
+      document.getElementById(
+        "confirmMessage"
+      ).textContent = `Are you sure you want to remove this member?`;
+      const confirmYes = document.getElementById("confirmYes");
+      const confirmNo = document.getElementById("confirmNo");
 
-    // Remove previous event listeners to prevent duplication
-    confirmYes.replaceWith(confirmYes.cloneNode(true));
-    confirmNo.replaceWith(confirmNo.cloneNode(true));
+      // Remove previous event listeners to prevent duplication
+      confirmYes.replaceWith(confirmYes.cloneNode(true));
+      confirmNo.replaceWith(confirmNo.cloneNode(true));
 
-    document.getElementById("confirmYes").addEventListener("click", () => removeMember(e));
-    document.getElementById("confirmNo").addEventListener("click", () => closeModal("confirmModal"));
+      document
+        .getElementById("confirmYes")
+        .addEventListener("click", () => removeMember(e));
+      document
+        .getElementById("confirmNo")
+        .addEventListener("click", () => closeModal("confirmModal"));
+    });
   });
-});
 };
 const renderTasks = (tasks, groups) => {
   const list = document.getElementById("tasks-list");
@@ -174,7 +164,28 @@ const renderTasks = (tasks, groups) => {
       section.appendChild(button);
       const addTaskBtn = document.querySelector("#add-task-btn");
       addTaskBtn
-        ? addTaskBtn.addEventListener("click", () => openModal("addTaskModal"))
+        ? addTaskBtn.addEventListener("click", async () => {
+            openModal("addTaskModal");
+            const groups = JSON.parse(sessionStorage.getItem("groupData"));
+            const select = document.getElementById("options");
+
+            // Remove all existing options
+            select.innerHTML = "";
+
+            // Re-add the default option
+            const defaultOption = document.createElement("option");
+            defaultOption.innerHTML = "Select a member";
+            defaultOption.value = ""; // Keeps it as a placeholder
+            select.appendChild(defaultOption);
+
+            // Add group members dynamically
+            groups.members.forEach((member) => {
+              const nameOption = document.createElement("option");
+              nameOption.value = member._id;
+              nameOption.innerHTML = member.name;
+              select.appendChild(nameOption);
+            });
+          })
         : ``;
     }
   }
@@ -183,69 +194,29 @@ const renderTasks = (tasks, groups) => {
     button.addEventListener("click", completeTask);
   });
   document.querySelectorAll("#remove-task").forEach((button) => {
-  button.addEventListener("click", (e) => {
-    openModal("confirmModal");
-    document.getElementById("confirmHeader").textContent = `Confirm`
-    document.getElementById("confirmMessage").textContent = `Are you sure you want to remove this task?`
-    const confirmYes = document.getElementById("confirmYes");
-    const confirmNo = document.getElementById("confirmNo");
+    button.addEventListener("click", (e) => {
+      openModal("confirmModal");
+      document.getElementById("confirmHeader").textContent = `Confirm`;
+      document.getElementById(
+        "confirmMessage"
+      ).textContent = `Are you sure you want to remove this task?`;
+      const confirmYes = document.getElementById("confirmYes");
+      const confirmNo = document.getElementById("confirmNo");
 
-    // Remove previous event listeners to prevent duplication
-    confirmYes.replaceWith(confirmYes.cloneNode(true));
-    confirmNo.replaceWith(confirmNo.cloneNode(true));
+      // Remove previous event listeners to prevent duplication
+      confirmYes.replaceWith(confirmYes.cloneNode(true));
+      confirmNo.replaceWith(confirmNo.cloneNode(true));
 
-    document.getElementById("confirmYes").addEventListener("click", () => removeTask(e));
-    document.getElementById("confirmNo").addEventListener("click", () => closeModal("confirmModal"));
+      document
+        .getElementById("confirmYes")
+        .addEventListener("click", () => removeTask(e));
+      document
+        .getElementById("confirmNo")
+        .addEventListener("click", () => closeModal("confirmModal"));
+    });
   });
-});
 };
-
-// async function fetchAndRenderTasks() {
-//   if (!token) {
-//     window.location.href = "/login.html";
-//     return;
-//   }
-//   try {
-//     let response = await fetch(`http://localhost:5000/api/groups`, {
-//       headers: {
-//         Authorization: `Bearer ${token}`,
-//         "Content-Type": "application/json",
-//       },
-//     });
-//     if (!response) {
-//       throw new Error("Failed to fetch group details");
-//     }
-//     const groups = await response.json();
-
-// // If no group found
-// if (!groups || Array.isArray(groups) && groups.length === 0) {
-//   document.getElementById("names-list").innerHTML = "<p>No group found. Please join or create a group.</p>";
-//   document.getElementById("tasks-list").innerHTML = "<p>No tasks to show.</p>";
-//   return;
-// }
-
-//     renderMembers(groups);
-//     response = await fetch(
-//       `http://localhost:5000/api/groups/${groups._id}/tasks`,
-//       {
-//         headers: {
-//           Authorization: `Bearer ${token}`,
-//           "Content-Type": "application/json",
-//         },
-//       }
-//     );
-
-//     if (!response.ok) {
-//       throw new Error("Failed to fetch tasks");
-//     }
-
-//     const tasks = await response.json();
-//     renderTasks(tasks);
-//   } catch (error) {
-//     console.error("Error loading tasks or members:", error);
-//   }
-// }
-const fetchAndRenderTasks = async () => {
+const fetchAndRender = async () => {
   if (!token) {
     window.location.href = "/login.html";
     return;
@@ -267,7 +238,7 @@ const fetchAndRenderTasks = async () => {
     sessionStorage.setItem("groupData", JSON.stringify(groups));
 
     // ✅ Handle case where no groups exist
-    if (!groups || (Array.isArray(groups) && groups.length === 0)) {
+    if (!groups) {
       document.getElementById("names-list").innerHTML =
         "<p>No group found. Please join or create a group.</p>";
       const createBtn = document.createElement("button");
@@ -275,7 +246,7 @@ const fetchAndRenderTasks = async () => {
       createBtn.id = "create-button";
       createBtn.innerHTML = "Create Group";
       document.querySelector(".names-card").appendChild(createBtn);
-      createBtn.addEventListener("click", () => openModal('createGroupModal'));
+      createBtn.addEventListener("click", () => openModal("createGroupModal"));
       document.getElementById("tasks-list").innerHTML =
         "<p>No tasks to show.</p>";
       return;
@@ -307,17 +278,7 @@ const fetchAndRenderTasks = async () => {
       "<p>Error loading members.</p>";
   }
 };
-
-const addTask = async (title, description, memberName, dueDate) => {
-  const member = groupData.members.find(
-    (m) => m.name.toLowerCase() === memberName.toLowerCase()
-  );
-
-  if (!member) {
-    alert("Member not found in the group.");
-    return;
-  }
-
+const addTask = async (title, description, memberId, dueDate) => {
   if (!token) {
     alert("You must be logged in to add a task.");
     return;
@@ -325,7 +286,7 @@ const addTask = async (title, description, memberName, dueDate) => {
   let taskData = {
     title: title,
     description: description,
-    assignedTo: member._id,
+    assignedTo: memberId,
     groupId: groupData._id,
   };
 
@@ -346,14 +307,13 @@ const addTask = async (title, description, memberName, dueDate) => {
     if (!response.ok) {
       throw new Error("Failed to add task");
     }
-    alert(`Task assigned to ${member.name} successfully`);
-    fetchAndRenderTasks();
+    alert(`Task assigned successfully`);
+    fetchAndRender();
   } catch (error) {
     console.error(error);
     alert("Failed to add task.");
   }
 };
-
 const completeTask = async (e) => {
   const taskId = e.target.dataset.id;
 
@@ -371,16 +331,14 @@ const completeTask = async (e) => {
       throw new Error("Failed to mark task as complete");
     }
 
-    fetchAndRenderTasks(); // Refresh task list
+    fetchAndRender(); // Refresh task list
   } catch (error) {
     console.error("Error completing task:", error);
     alert("Could not complete the task.");
   }
 };
-
 const removeTask = async (e) => {
   const taskId = e.target.dataset.id;
-  if (!confirm("Are you sure you want to remove this task?")) return;
   try {
     const response = await fetch(`http://localhost:5000/api/tasks/${taskId}`, {
       method: "DELETE",
@@ -396,15 +354,15 @@ const removeTask = async (e) => {
     console.error(error);
     alert("Could not remove task");
   }
-  closeModal("confirmModal")
-  fetchAndRenderTasks();
+  closeModal("confirmModal");
+  fetchAndRender();
 };
-
 const leaveGroup = async (groups) => {
   if (groups.createdBy == userData.id) {
-    
-    document.getElementById("confirmHeader").textContent = `Alert`
-    document.getElementById("confirmMessage").textContent = `As an admin, leaving the group will mean the termination of the group. Are you sure you want to leave the group?`
+    document.getElementById("confirmHeader").textContent = `Alert`;
+    document.getElementById(
+      "confirmMessage"
+    ).textContent = `As an admin, leaving the group will mean the termination of the group. Are you sure you want to leave the group?`;
     const confirmYes = document.getElementById("confirmYes");
     const confirmNo = document.getElementById("confirmNo");
 
@@ -412,12 +370,15 @@ const leaveGroup = async (groups) => {
     confirmYes.replaceWith(confirmYes.cloneNode(true));
     confirmNo.replaceWith(confirmNo.cloneNode(true));
 
-    document.getElementById("confirmYes").addEventListener("click", () => deleteGroup(groups));
-    document.getElementById("confirmNo").addEventListener("click", () => closeModal("confirmModal"));
-    
+    document
+      .getElementById("confirmYes")
+      .addEventListener("click", () => deleteGroup(groups));
+    document
+      .getElementById("confirmNo")
+      .addEventListener("click", () => closeModal("confirmModal"));
+
     return;
   }
-  if (!confirm(`Are you sure you want to leave "${groups.name}"?`)) return;
   try {
     // Call the API to remove the member and delete their tasks
     const response = await fetch(
@@ -440,16 +401,15 @@ const leaveGroup = async (groups) => {
     document.getElementById("add-roommate-button")
       ? document.getElementById("add-roommate-button").remove()
       : "";
-    closeModal("confirmModal")
+    closeModal("confirmModal");
     // Refresh the tasks and members UI
-    await fetchAndRenderTasks(); // This should refresh the UI to reflect changes
+    await fetchAndRender(); // This should refresh the UI to reflect changes
   } catch (error) {
     console.error("Error removing member and deleting tasks:", error);
     alert("Failed to leave the group.");
   }
 };
 const deleteGroup = async (groups) => {
-
   try {
     const response = await fetch(
       `http://localhost:5000/api/groups/${groups._id}`,
@@ -468,8 +428,8 @@ const deleteGroup = async (groups) => {
     document.getElementById("leave-group-button").remove();
     document.getElementById("add-roommate-button").remove();
     document.getElementById("add-task-btn").remove();
-    closeModal("confirmModal")
-    fetchAndRenderTasks();
+    closeModal("confirmModal");
+    fetchAndRender();
   } catch (error) {
     console.error({ error });
   }
@@ -494,8 +454,8 @@ const removeMember = async (e) => {
     if (!response.ok) {
       throw new Error("Failed to remove member");
     }
-    closeModal("confirmModal")
-    await fetchAndRenderTasks(); // Refresh UI
+    closeModal("confirmModal");
+    await fetchAndRender(); // Refresh UI
   } catch (error) {
     console.error("Error removing member:", error);
     alert("Could not remove the member.");
@@ -536,14 +496,13 @@ const addMember = async (email) => {
     }
 
     alert("Member added successfully");
-    fetchAndRenderTasks(); // Refresh to reflect the new member
+    fetchAndRender(); // Refresh to reflect the new member
   } catch (error) {
     console.error("Error adding member:", error);
     alert(`${error}`);
   }
 };
 const createGroup = async (name) => {
-  
   try {
     const response = await fetch("http://localhost:5000/api/groups", {
       method: "POST",
@@ -558,33 +517,22 @@ const createGroup = async (name) => {
     if (!response.ok) {
       alert("Failed to create group!");
     }
-    await fetchAndRenderTasks();
+    await fetchAndRender();
   } catch (error) {
     console.error(error);
   }
 };
-const formatDate = (dueDate) => {
-  if (!dueDate) return;
-  const formattedDate = new Date(dueDate).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-  return formattedDate;
-};
-
 const submitNewGroup = () => {
-  const name = document.getElementById("newGroupName").value.trim()
-  if(!name){
-    alert("Please enter a name.")
-    return
+  const name = document.getElementById("newGroupName").value.trim();
+  if (!name) {
+    alert("Please enter a name.");
+    return;
   }
-  createGroup(name)
-  document.getElementById("newGroupName").value = ''
-  closeModal('createGroupModal')
-}
-
-function submitNewRoommate() {
+  createGroup(name);
+  document.getElementById("newGroupName").value = "";
+  closeModal("createGroupModal");
+};
+const submitNewRoommate = () => {
   const email = document.getElementById("newRoommateEmail").value.trim();
   if (!email) {
     alert("Please enter an email.");
@@ -593,34 +541,51 @@ function submitNewRoommate() {
   addMember(email);
   document.getElementById("newRoommateEmail").value = "";
   closeModal("addRoommateModal");
-}
-
-function submitNewTask() {
+};
+const submitNewTask = () => {
   const title = document.getElementById("taskTitle").value.trim();
   const description = document.getElementById("taskDescription").value.trim();
-  const memberName = document.getElementById("taskAssignee").value.trim();
+  const memberId = document.getElementById("options").value;
   let dueDate = "";
   dueDate = document.getElementById("taskDeadline").value;
 
-  if (!title || !description || !memberName) {
+  if (!title || !description || !memberId) {
     alert("Please fill in all fields.");
     return;
   }
 
-  addTask(title, description, memberName, dueDate);
+  addTask(title, description, memberId, dueDate);
 
   // Reset modal inputs
   document.getElementById("taskTitle").value = "";
   document.getElementById("taskDescription").value = "";
-  document.getElementById("taskAssignee").value = "";
   document.getElementById("taskDeadline").value = "";
 
   closeModal("addTaskModal");
-}
+};
+const optionElements = async () => {
+  const groups = JSON.parse(sessionStorage.getItem("groupData"));
+  const select = document.getElementById("options");
 
+  // Remove all existing options
+  select.innerHTML = "";
+
+  // Re-add the default option
+  const defaultOption = document.createElement("option");
+  defaultOption.innerHTML = "Select a member";
+  defaultOption.value = ""; // Keeps it as a placeholder
+  select.appendChild(defaultOption);
+
+  // Add group members dynamically
+  groups.members.forEach((member) => {
+    const nameOption = document.createElement("option");
+    nameOption.value = member._id;
+    nameOption.innerHTML = member.name;
+    select.appendChild(nameOption);
+  });
+};
 // Close modals if user clicks outside content
 
-
 document.addEventListener("DOMContentLoaded", async () => {
-  await fetchAndRenderTasks();
+  await fetchAndRender();
 });

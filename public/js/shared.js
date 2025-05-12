@@ -4,8 +4,6 @@ const usernameElement = document.querySelector(".profile-name");
 let userName = userData.name
 
 if (usernameElement && userName) {
-  userName = userName.replace(/"/g, "");
-  userName = userName.slice(0, 1).toUpperCase() + userName.slice(1);
   usernameElement.innerHTML = userName;
 }
 const groups = async () => {
@@ -33,6 +31,15 @@ const alert = (message) => {
   openModal("alertModal")
   document.getElementById("alertBody").textContent = message
 }
+const formatDate = (dueDate) => {
+  if (!dueDate) return;
+  const formattedDate = new Date(dueDate).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+  return formattedDate;
+};
 window.onclick = function (event) {
   const addRoommateModal = document.getElementById("addRoommateModal");
   const addTaskModal = document.getElementById("addTaskModal");

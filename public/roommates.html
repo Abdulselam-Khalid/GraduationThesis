@@ -1,42 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dashboard - Roomie Task Manager</title>
-    <link rel="stylesheet" href="/css/styles.css" />
-    <!-- Load Auth module first -->
-    <script src="/js/auth.js"></script>
-  </head>
-  <body>
-    <div class="dashboard-root">
-      <!-- Sidebar -->
-      <aside class="sidebar">
-        <div class="sidebar-logo">
-          <img class="faceavatar" src="/assets/logo.png" alt="Logo" />
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard - Roomie Task Manager</title>
+  <link rel="stylesheet" href="/css/styles.css" />
+  <!-- Load Auth module first -->
+  <script src="/js/auth.js"></script>
+</head>
+
+<body>
+  <div class="dashboard-root">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <img class="faceavatar" src="/assets/logo.png" alt="Logo" />
+      </div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="#">Home</a>
+        <a href="tasks.html">Tasks</a>
+        <a href="roommates.html" class="active">Roommates</a>
+        <a href="#">Settings</a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Top Nav -->
+      <header class="top-nav">
+        <h1>Welcome to ROOMIE</h1>
+        <div class="profile-menu">
+          <span class="profile-name"></span>
+          <button class="logout-btn">Log out</button>
         </div>
-        <nav class="sidebar-nav">
-          <a href="dashboard.html">Dashboard</a>
-          <a href="#">Home</a>
-          <a href="tasks.html" >Tasks</a>
-          <a href="roommates.html" class="active">Roommates</a>
-          <a href="#">Settings</a>
-        </nav>
-      </aside>
+      </header>
 
-      <!-- Main Content -->
-      <div class="main-content">
-        <!-- Top Nav -->
-        <header class="top-nav">
-          <h1>Welcome to ROOMIE</h1>
-          <div class="profile-menu">
-            <span class="profile-name"></span>
-            <button class="logout-btn">Log out</button>
-          </div>
-        </header>
-
-        <!-- Dashboard Grid -->
-        <div class="dashboard-grid">
+      <!-- Dashboard Grid -->
+      <div class="dashboard-grid">
         <!-- Today's Tasks -->
         <section class="card names-card">
           <h2>Roommates</h2>
@@ -44,73 +46,77 @@
             <!-- Populated by JS -->
           </div>
         </section>
-        
+
       </div>
-        <div class="dashboard-grid">
+      <div class="dashboard-grid">
         <!-- Today's Tasks -->
         <section class="card tasks-card">
           <h2>Roommate Tasks</h2>
           <ul id="tasks-list">
             <!-- Populated by JS -->
           </ul>
-          
+
         </section>
-        
+
       </div>
     </div>
     <!-- Add Roommate Modal -->
-<div id="addRoommateModal" class="modal">
-  <div class="modal-content">
-    <span class="close" onclick="closeModal('addRoommateModal')">&times;</span>
-    <h3>Add Roommate</h3>
-    <input class="primaryInput focus" type="email" id="newRoommateEmail" placeholder="Enter email" />
-    <button class="add-btn" onclick="submitNewRoommate()">Add</button>
-  </div>
-</div>
-<!-- Create Group Modal -->
-<div id="createGroupModal" class="modal">
-  <div class="modal-content">
-    <span class="close" onclick="closeModal('createGroupModal')">&times;</span>
-    <h3>Create new group</h3>
-    <input class="primaryInput focus" type="text" id="newGroupName" placeholder="Enter name of the group" />
-    <button class="add-btn" onclick="submitNewGroup()">Add</button>
-  </div>
-</div>
+    <div id="addRoommateModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeModal('addRoommateModal')">&times;</span>
+        <h3>Add Roommate</h3>
+        <input class="primaryInput focus" type="email" id="newRoommateEmail" placeholder="Enter email" />
+        <button class="add-btn" onclick="submitNewRoommate()">Add</button>
+      </div>
+    </div>
+    <!-- Create Group Modal -->
+    <div id="createGroupModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeModal('createGroupModal')">&times;</span>
+        <h3>Create new group</h3>
+        <input class="primaryInput focus" type="text" id="newGroupName" placeholder="Enter name of the group" />
+        <button class="add-btn" onclick="submitNewGroup()">Add</button>
+      </div>
+    </div>
 
-<!-- Add Task Modal -->
-<div id="addTaskModal" class="modal">
-  <div class="modal-content">
-    <span class="close" onclick="closeModal('addTaskModal')">&times;</span>
-    <h3>Add Task</h3>
-    <input type="text" class="primaryInput focus" id="taskTitle" placeholder="Task title" />
-    <input type="text" class="primaryInput focus" id="taskDescription" placeholder="Task description" />
-    <input type="text" class="primaryInput focus" id="taskAssignee" placeholder="Assign to" />
-    <input type="date" class="primaryInput focus" id="taskDeadline" />
-    <button class="add-btn" onclick="submitNewTask()">Add Task</button>
-  </div>
-</div>
+    <!-- Add Task Modal -->
+    <div id="addTaskModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeModal('addTaskModal')">&times;</span>
+        <h3>Add Task</h3>
+        <input type="text" class="primaryInput focus" id="taskTitle" placeholder="Task title" />
+        <input type="text" class="primaryInput focus" id="taskDescription" placeholder="Task description" />
+        <select class="primaryInput focus" id="options" name="options">
 
-<div id="confirmModal" class="modal" style="display:none;">
-  <div class="modal-content">
-    <span class="close" onclick="closeModal('confirmModal')">&times;</span>
-    <h3 id="confirmHeader"></h3>
-    <p id="confirmMessage" style="margin: 10px;"></p>
-    <button class="confirm-btn"  id="confirmYes">Yes</button>
-    <button class="confirm-btn"  id="confirmNo">No</button>
-  </div>
-</div>
+        </select>
 
-<div id="alertModal" class="modal" style="display: none;">
-  <div class="modal-content">
-    <h3 id="alertBody">Successful deleted the groups</h3>
-    <button class="confirm-btn" id="okButton" onclick="closeModal('alertModal')">OK</button>
-  </div>
+        <input type="date" class="primaryInput focus" id="taskDeadline" placeholder="Deadline" />
+        <button class="add-btn" onclick="submitNewTask()">Add Task</button>
+      </div>
+    </div>
 
-</div>
+    <div id="confirmModal" class="modal" style="display:none;">
+      <div class="modal-content">
+        <span class="close" onclick="closeModal('confirmModal')">&times;</span>
+        <h3 id="confirmHeader"></h3>
+        <p id="confirmMessage" style="margin: 10px;"></p>
+        <button class="confirm-btn" id="confirmYes">Yes</button>
+        <button class="confirm-btn" id="confirmNo">No</button>
+      </div>
+    </div>
+
+    <div id="alertModal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <h3 id="alertBody">Successful deleted the groups</h3>
+        <button class="confirm-btn" id="okButton" onclick="closeModal('alertModal')">OK</button>
+      </div>
+
+    </div>
     <!-- Load dashboard script after DOM is ready -->
-    
-    
+
+
     <script src="/js/roommates.js"></script>
     <script src="/js/shared.js"></script>
-  </body>
+</body>
+
 </html>
