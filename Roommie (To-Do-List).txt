@@ -1,5 +1,5 @@
 Roommie (To-Do-List)
 
-Fetch and render function in dashboard.js
-Upcoming deadlines in dashboard page
+Fetch and render function in dashboard.js (Done)
+Upcoming deadlines in dashboard page (Done)
 Start the financial side of the website

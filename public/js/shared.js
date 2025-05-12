@@ -1,5 +1,7 @@
 // shared.js
-
+const token = sessionStorage.getItem("token");
+const userData = JSON.parse(sessionStorage.getItem("userData"));
+const groupData = JSON.parse(sessionStorage.getItem("groupData"));
 const usernameElement = document.querySelector(".profile-name");
 let userName = userData.name
 
@@ -23,7 +25,6 @@ const groups = async () => {
 function openModal(modalId) {
   document.getElementById(modalId).style.display = "block";
 }
-
 function closeModal(modalId) {
   document.getElementById(modalId).style.display = "none";
 }
@@ -39,6 +40,23 @@ const formatDate = (dueDate) => {
     day: "numeric",
   });
   return formattedDate;
+};
+const showConfirmationModal = ({ message, confirmText = "Yes", cancelText = "No", onConfirm }) => {
+  openModal("confirmModal");
+  
+  document.getElementById("confirmHeader").textContent = "Confirm";
+  document.getElementById("confirmMessage").textContent = message;
+
+  ["confirmYes", "confirmNo"].forEach(id => {
+    const button = document.getElementById(id);
+    button.replaceWith(button.cloneNode(true)); // Prevent duplicate listeners
+  });
+
+  document.getElementById("confirmYes").textContent = confirmText;
+  document.getElementById("confirmNo").textContent = cancelText;
+
+  document.getElementById("confirmYes").addEventListener("click", onConfirm);
+  document.getElementById("confirmNo").addEventListener("click", () => closeModal("confirmModal"));
 };
 window.onclick = function (event) {
   const addRoommateModal = document.getElementById("addRoommateModal");

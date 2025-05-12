@@ -51,5 +51,20 @@ const deleteTask = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+const completeTask = async (req, res) => {
+  const { completed } = req.body;
+  try {
+    const task = await Task.updateOne(
+      { _id: req.params.id },
+      { $set: { completed } }
+    );
 
-module.exports = { getTasks, createTask, updateTask, deleteTask };
+    if (task.modifiedCount === 0)
+      throw new Error("Task not found or not updated");
+
+    res.status(200).json({ message: "Task updated successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+module.exports = { getTasks, createTask, updateTask, deleteTask, completeTask };

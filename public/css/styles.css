@@ -332,7 +332,7 @@ body {
 .confirm-btn:hover {
   background-color: hsl(0, 0%, 40%);
 }
-.completed-task-btn {
+.complete-btn {
   background: hsl(118, 90%, 40%);
   color: #fff;
   border: none;
@@ -343,7 +343,7 @@ body {
   align-self: flex-end;
   transition: background 0.3s;
 }
-.completed-task-btn:hover {
+.complete-btn:hover {
   background: hsl(118, 90%, 30%);
 }
 .finished-task-btn {
@@ -435,7 +435,8 @@ body {
   background-color: #f4f4f4;
 }
 
-.remove-btn, .leave-btn {
+.remove-btn,
+.leave-btn {
   background: hsl(0, 100%, 50%);
   color: #fff;
   border: none;
@@ -446,11 +447,12 @@ body {
   align-self: flex-end;
   transition: background 0.3s;
 }
-.leave-btn{
+.leave-btn {
   border-radius: 6px;
   margin-top: 10px;
 }
-.remove-btn:hover, .leave-btn:hover {
+.remove-btn:hover,
+.leave-btn:hover {
   background-color: hsl(0, 100%, 40%);
 }
 .modal {
@@ -464,7 +466,7 @@ body {
   overflow: auto;
   justify-content: center;
   align-content: center;
-  background-color: rgba(0,0,0,0.4); /* Black background with opacity */
+  background-color: rgba(0, 0, 0, 0.4); /* Black background with opacity */
 }
 
 .modal-content {
