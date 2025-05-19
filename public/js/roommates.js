@@ -1,9 +1,11 @@
 const renderMembers = async (group) => {
   document.getElementById("create-button")?.remove();
   const list = document.getElementById("names-list");
-  list.innerHTML = ""; // Clear the list before rendering
+  list.innerHTML = "";
 
-  // Create and populate the table
+  const currentUser = group.members.find((m) => m._id === userData.id);
+  const isAdmin = currentUser?.role === "admin";
+
   const table = document.createElement("table");
   table.classList.add("members-table");
 
@@ -11,26 +13,29 @@ const renderMembers = async (group) => {
     <tr>
       <th>Names</th>
       <th>Email</th>
-      ${group.createdBy === userData.id ? "<th>Action</th>" : ""}
+      <th>Role</th>
+      ${isAdmin ? "<th>Action</th>" : ""}
     </tr>
     ${group.members
-      .map(
-        (member) => `
-      <tr>
-        <td>${member.name}</td>
-        <td>${member.email}</td>
-        ${
-          group.createdBy === userData.id
-            ? `<td>${
-                group.createdBy !== member._id
-                  ? `<button id="remove-member" class="remove-btn" data-group-id="${group._id}" data-id="${member._id}">X</button>`
-                  : "Admin"
-              }</td>`
-            : ""
-        }
-      </tr>
-    `
-      )
+      .map((member) => {
+        const canRemove = isAdmin && member.role !== "admin";
+        return `
+          <tr>
+            <td>${member.name}</td>
+            <td>${member.email}</td>
+            <td>${member.role}</td>
+            ${
+              isAdmin
+                ? `<td>${
+                    canRemove
+                      ? `<button id="remove-member" class="remove-btn" data-group-id="${group._id}" data-id="${member._id}">X</button>`
+                      : "—"
+                  }</td>`
+                : ""
+            }
+          </tr>
+        `;
+      })
       .join("")}
   `;
 
@@ -47,7 +52,7 @@ const renderMembers = async (group) => {
     }
   };
 
-  if (group.createdBy === userData.id) {
+  if (isAdmin) {
     addButton("add-roommate-button", "Add Roommate", "add-btn", () =>
       openModal("addRoommateModal")
     );
@@ -71,12 +76,16 @@ const renderMembers = async (group) => {
     });
   });
 };
+
 const renderTasks = (tasks, group) => {
   const list = document.getElementById("tasks-list");
   list.innerHTML = "";
 
   const currentDate = new Date();
   currentDate.setHours(0, 0, 0, 0);
+
+  const currentUser = group.members.find((m) => m._id === userData.id);
+  const isAdmin = currentUser?.role === "admin";
 
   tasks.forEach((task) => {
     const li = document.createElement("li");
@@ -87,8 +96,8 @@ const renderTasks = (tasks, group) => {
     const deadlineStyle = isPastDeadline ? "color: red;" : "";
 
     const showCompleteBtn =
-      task.assignedTo.name === userData.name && !task.completed;
-    const showRemoveBtn = userData.id === group.createdBy;
+      task.assignedTo._id === userData.id && !task.completed;
+    const showRemoveBtn = isAdmin;
 
     li.innerHTML = `
       <span>
@@ -101,9 +110,7 @@ const renderTasks = (tasks, group) => {
         ${
           task.completed
             ? "<strong>Done</strong>"
-            : `<strong style="${deadlineStyle}">${formatDate(
-                task.dueDate
-              )}</strong>`
+            : `<strong style="${deadlineStyle}">${formatDate(task.dueDate)}</strong>`
         }
         ${
           showCompleteBtn
@@ -121,11 +128,8 @@ const renderTasks = (tasks, group) => {
     list.appendChild(li);
   });
 
-  // Add Task button for group creator
-  if (
-    !document.querySelector("#add-task-btn") &&
-    userData.id === group.createdBy
-  ) {
+  // Add Task button for admins only
+  if (!document.querySelector("#add-task-btn") && isAdmin) {
     const button = document.createElement("button");
     button.textContent = "Add Task";
     button.className = "add-btn";
@@ -167,8 +171,10 @@ const renderTasks = (tasks, group) => {
     })
   );
 };
+
 const fetchAndRender = async () => {
   if (!token) return (window.location.href = "/login.html");
+
   try {
     // Fetch group details
     const groupRes = await fetch("http://localhost:5000/api/groups", {
@@ -177,9 +183,19 @@ const fetchAndRender = async () => {
         "Content-Type": "application/json",
       },
     });
-    if (!groupRes.ok) throw new Error("Failed to fetch group details");
-    const group = await groupRes.json();
-    sessionStorage.setItem("groupData", JSON.stringify(group));
+
+    let group = null;
+
+    if (groupRes.status === 404) {
+      // User has no group yet
+      group = null;
+    } else if (!groupRes.ok) {
+      // Other server errors
+      const errorText = await groupRes.text();
+      throw new Error(`Failed to fetch group: ${errorText}`);
+    } else {
+      group = await groupRes.json();
+    }
 
     const namesList = document.getElementById("names-list");
     const tasksList = document.getElementById("tasks-list");
@@ -196,11 +212,17 @@ const fetchAndRender = async () => {
       createBtn.id = "create-button";
       createBtn.textContent = "Create Group";
       namesCard.appendChild(createBtn);
-      createBtn.addEventListener("click", () => openModal("createGroupModal"));
+      createBtn.addEventListener("click", () =>
+        openModal("createGroupModal")
+      );
 
       return;
     }
 
+    // Save group info
+    sessionStorage.setItem("groupData", JSON.stringify(group));
+
+    // Render members
     renderMembers(group);
 
     // Fetch tasks for the group
@@ -213,8 +235,12 @@ const fetchAndRender = async () => {
         },
       }
     );
+
     if (!tasksRes.ok) throw new Error("Failed to fetch tasks");
-    renderTasks(await tasksRes.json(), group);
+
+    const tasks = await tasksRes.json();
+    removeOldTasks(tasks)
+    renderTasks(tasks, group);
   } catch (error) {
     console.error("Error loading tasks or members:", error);
     document.getElementById("tasks-list").innerHTML =
@@ -223,6 +249,7 @@ const fetchAndRender = async () => {
       "<p>Error loading members.</p>";
   }
 };
+
 const addTask = async (title, description, memberId, dueDate, groups) => {
   if (!token) return alert("You must be logged in to add a task.");
 
@@ -283,10 +310,14 @@ const completeTask = async (e) => {
     alert("Could not complete the task.");
   }
 };
-const removeTask = async (e) => {
+const removeTask = async (e, task) => {
   try {
+    // If called from event, get id from event, else from task object
+    const taskId = e?.target?.dataset?.id ?? task?._id;
+    if (!taskId) throw new Error("Task ID not found");
+
     const response = await fetch(
-      `http://localhost:5000/api/tasks/${e.target.dataset.id}`,
+      `http://localhost:5000/api/tasks/${taskId}`,
       {
         method: "DELETE",
         headers: {
@@ -298,13 +329,16 @@ const removeTask = async (e) => {
 
     if (!response.ok) throw new Error("Failed to delete task");
 
-    closeModal("confirmModal");
+    // Only close modal if called from event
+    if (e?.target) closeModal("confirmModal");
+
     fetchAndRender();
   } catch (error) {
     console.error(error);
     alert("Could not remove task.");
   }
 };
+
 const leaveGroup = async (groups) => {
   if (groups.createdBy === userData.id) {
     showConfirmationModal({
@@ -483,6 +517,16 @@ const submitNewTask = () => {
     (id) => (document.getElementById(id).value = "")
   );
   closeModal("addTaskModal");
+};
+const removeOldTasks = (tasks) => {
+  const cutoffDate = new Date();
+  cutoffDate.setDate(cutoffDate.getDate() - 7); // 7 days
+
+  tasks.forEach((task) => {
+    if (new Date(task.createdAt) <= cutoffDate && task.completed === true) {
+      removeTask(null, task)
+    }
+  });
 };
 
 document.addEventListener("DOMContentLoaded", async () => {
