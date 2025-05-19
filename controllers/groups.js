@@ -1,77 +1,78 @@
-const mongoose = require('mongoose')
-const Task = require('../models/Task')
+const mongoose = require("mongoose");
+const Task = require("../models/Task");
 const Group = require("../models/Groups");
-const User = require("../models/User")
+const User = require("../models/User");
 
+// ✅ Get group info including member details and their roles
 const getMembers = async (req, res) => {
-    const userId = req.userID
+  const userId = req.userID;
   try {
-    
-    const group = await Group.findOne({members:userId}).populate("members", "name email")
-    res.status(200).json(group)
-  } catch (erorr) {
-    res.status(500).json({error:error.message})
+    const group = await Group.findOne({ "members.userId": userId }).populate("members.userId", "name email");
+    if (!group) {
+      return res.status(404).json({ message: "Group not found" });
+    }
+
+    const formattedMembers = group.members.map(m => ({
+      _id: m.userId._id,
+      name: m.userId.name,
+      email: m.userId.email,
+      role: m.role,
+    }));
+
+    res.status(200).json({ ...group.toObject(), members: formattedMembers });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 };
+
+// ✅ Create a group with the user as admin
 const createGroup = async (req, res) => {
-  const userId = req.userID
-  const {name} = req.body
-  
+  const userId = req.userID;
+  const { name } = req.body;
+
   try {
-    const existingGroup = await Group.findOne({ members: userId });
-if (existingGroup) {
-  throw new Error("User already has a group");
-}
-      const group = await Group.create({
+    const existingGroup = await Group.findOne({ "members.userId": userId });
+    if (existingGroup) {
+      throw new Error("User already has a group");
+    }
+
+    const group = await Group.create({
       name,
-      members:[userId],
-      createdBy:userId
-    })
-    res.status(201).json(group)
+      members: [{ userId, role: "admin" }],
+      createdBy: userId,
+    });
+
+    res.status(201).json(group);
   } catch (error) {
-    res.status(500).json({error:error.message})
+    res.status(500).json({ error: error.message });
   }
-}
-// const getGroupTasks = async (req, res) => {
-//   const groupId = req.params.groupId;
+};
 
-//   try {
-//       // Find the group and get member IDs
-//       const group = await Group.findById(groupId);
-//       if (!group) {
-//           return res.status(404).json({ message: "Group not found" });
-//       }
-
-//       // Retrieve tasks assigned to any member of the group
-//       const tasks = await Task.find({ assignedTo: { $in: group.members } }).populate("assignedTo", "name email");
-
-//       res.status(200).json(tasks);
-//   } catch (err) {
-//       res.status(500).json({ error: err.message });
-//   }
-// };
+// ✅ Get all tasks associated with a group
 const getGroupTasks = async (req, res) => {
-  try{
-    const tasks = await Task.find({groupId:req.params.groupId}).populate("assignedTo", "name email")
-    res.status(200).json(tasks)
-  }catch(err){
-    res.status(500).json({error: err.message})
+  try {
+    const tasks = await Task.find({ groupId: req.params.groupId }).populate("assignedTo", "name email");
+    res.status(200).json(tasks);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
-}
+};
+
+// ✅ Remove a member from group and delete their tasks
 const removeMember = async (req, res) => {
   const { groupId, memberId } = req.params;
 
   try {
     const group = await Group.findByIdAndUpdate(
       groupId,
-      { $pull: { members: memberId } }, 
-      { new: true } 
+      { $pull: { members: { userId: memberId } } },
+      { new: true }
     );
 
     if (!group) {
       return res.status(404).json({ message: "Group not found" });
     }
-    
+
     await Task.deleteMany({ assignedTo: memberId });
 
     res.status(200).json({ message: "Member removed successfully", group });
@@ -80,6 +81,8 @@ const removeMember = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// ✅ Add a new member to the group with "member" role
 const addMember = async (req, res) => {
   const { groupId } = req.params;
   const { email } = req.body;
@@ -96,13 +99,12 @@ const addMember = async (req, res) => {
       return res.status(404).json({ message: "Group not found" });
     }
 
-    // 🔐 Check if the user is already in any group
-    const existingGroup = await Group.findOne({ members: user._id });
-    if (existingGroup) {
+    const alreadyInGroup = await Group.findOne({ "members.userId": user._id });
+    if (alreadyInGroup) {
       return res.status(400).json({ message: "User is already a member of another group" });
     }
 
-    group.members.push(user._id);
+    group.members.push({ userId: user._id, role: "member" });
     await group.save();
 
     res.status(200).json({ message: "User added to group", group });
@@ -112,21 +114,32 @@ const addMember = async (req, res) => {
   }
 };
 
+// ✅ Delete a group and its tasks
 const deleteGroup = async (req, res) => {
-  const {groupId} = req.params
-  try {
-    const response = await Group.findOneAndDelete({_id:groupId})
-    if(!response){
-      return res.status(404).json({message:'Group not found'})
-    }
-    const task = await Task.deleteMany({groupId:groupId})
-    if(!task){
-      return res.status(404).json({message: 'Task not found'})
-    }
-    res.status(200).json({message:'successfully'})
-  } catch (error) {
-    res.status(500).json({error:error.message})
-  }
-}
+  const { groupId } = req.params;
 
-module.exports = {getMembers, createGroup, getGroupTasks, removeMember, addMember, deleteGroup}
+  try {
+    const response = await Group.findOneAndDelete({ _id: groupId });
+    if (!response) {
+      return res.status(404).json({ message: "Group not found" });
+    }
+
+    const task = await Task.deleteMany({ groupId: groupId });
+    if (!task) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+
+    res.status(200).json({ message: "Successfully deleted group and tasks" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+module.exports = {
+  getMembers,
+  createGroup,
+  getGroupTasks,
+  removeMember,
+  addMember,
+  deleteGroup,
+};

@@ -31,7 +31,6 @@ const renderTasks = async (tasks) => {
 };
 const renderDeadlines = (tasks) => {
   if (!tasks || !Array.isArray(tasks)) return;
-  console.log(tasks);
   const tbody = document.getElementById("deadlines-list");
   const currentDate = new Date();
   currentDate.setHours(0, 0, 0, 0); // Normalize time

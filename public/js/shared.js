@@ -72,6 +72,5 @@ window.onclick = function (event) {
   if (event.target === alertModal) closeModal("alertModal");
 };
 document.addEventListener("DOMContentLoaded", async () => {
-  sessionStorage.removeItem("groupData");
   await groups();
 });
