@@ -32,7 +32,7 @@
         <h1>Personal Tasks</h1>
         <div class="profile-menu">
           <span class="profile-name"></span>
-          <button class="logout-btn">Log out</button>
+          <button class="logout-button">Log out</button>
         </div>
       </header>
 
@@ -56,7 +56,7 @@
         <input type="text" class="primaryInput focus" id="taskTitle" placeholder="Task title" />
         <input type="text" class="primaryInput focus" id="taskDescription" placeholder="Task description" />
         <input type="date" class="primaryInput focus" id="taskDeadline" placeholder="Deadline" />
-        <button class="add-btn" onclick="submitNewTask()">Add Task</button>
+        <button class="add-button" onclick="submitNewTask()">Add Task</button>
       </div>
     </div>
 
@@ -65,15 +65,15 @@
         <span class="close" onclick="closeModal('confirmModal')">&times;</span>
         <h3 id="confirmHeader"></h3>
         <p id="confirmMessage" style="margin: 10px;"></p>
-        <button class="confirm-btn" id="confirmYes">Yes</button>
-        <button class="confirm-btn" id="confirmNo">No</button>
+        <button class="confirm-button" id="confirmYes">Yes</button>
+        <button class="confirm-button" id="confirmNo">No</button>
       </div>
     </div>
 
     <div id="alertModal" class="modal" style="display: none;">
       <div class="modal-content">
         <h3 id="alertBody">Successful deleted the groups</h3>
-        <button class="confirm-btn" id="okButton" onclick="closeModal('alertModal')">OK</button>
+        <button class="confirm-button" id="okButton" onclick="closeModal('alertModal')">OK</button>
       </div>
 
     </div>

@@ -142,9 +142,9 @@ function checkAuth() {
     window.location.href = "/dashboard.html";
   }
 
-  const logoutBtn = document.querySelector(".logout-btn");
-  if (logoutBtn) {
-    logoutBtn.addEventListener("click", Auth.logout);
+  const logoutButton = document.querySelector(".logout-button");
+  if (logoutButton) {
+    logoutButton.addEventListener("click", Auth.logout);
   }
 }
 

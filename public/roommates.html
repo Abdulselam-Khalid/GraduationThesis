@@ -32,7 +32,7 @@
         <h1>View Roommates</h1>
         <div class="profile-menu">
           <span class="profile-name"></span>
-          <button class="logout-btn">Log out</button>
+          <button class="logout-button">Log out</button>
         </div>
       </header>
 
@@ -65,7 +65,7 @@
         <span class="close" onclick="closeModal('addRoommateModal')">&times;</span>
         <h3>Add Roommate</h3>
         <input class="primaryInput focus" type="email" id="newRoommateEmail" placeholder="Enter email" />
-        <button class="add-btn" onclick="submitNewRoommate()">Add</button>
+        <button class="add-button" onclick="submitNewRoommate()">Add</button>
       </div>
     </div>
     <!-- Create Group Modal -->
@@ -74,7 +74,7 @@
         <span class="close" onclick="closeModal('createGroupModal')">&times;</span>
         <h3>Create new group</h3>
         <input class="primaryInput focus" type="text" id="newGroupName" placeholder="Enter name of the group" />
-        <button class="add-btn" onclick="submitNewGroup()">Add</button>
+        <button class="add-button" onclick="submitNewGroup()">Add</button>
       </div>
     </div>
 
@@ -90,7 +90,7 @@
         </select>
 
         <input type="date" class="primaryInput focus" id="taskDeadline" placeholder="Deadline" />
-        <button class="add-btn" onclick="submitNewTask()">Add Task</button>
+        <button class="add-button" onclick="submitNewTask()">Add Task</button>
       </div>
     </div>
 
@@ -99,15 +99,15 @@
         <span class="close" onclick="closeModal('confirmModal')">&times;</span>
         <h3 id="confirmHeader"></h3>
         <p id="confirmMessage" style="margin: 10px;"></p>
-        <button class="confirm-btn" id="confirmYes">Yes</button>
-        <button class="confirm-btn" id="confirmNo">No</button>
+        <button class="confirm-button" id="confirmYes">Yes</button>
+        <button class="confirm-button" id="confirmNo">No</button>
       </div>
     </div>
 
     <div id="alertModal" class="modal" style="display: none;">
       <div class="modal-content">
         <h3 id="alertBody">Successful deleted the groups</h3>
-        <button class="confirm-btn" id="okButton" onclick="closeModal('alertModal')">OK</button>
+        <button class="confirm-button" id="okButton" onclick="closeModal('alertModal')">OK</button>
       </div>
 
     </div>

@@ -20,12 +20,12 @@ const renderTasks = async (tasks) => {
             }
             ${
               !task.completed
-                ? `<button data-id="${task._id}" class="complete-btn">Complete</button>`
+                ? `<button data-id="${task._id}" class="complete-button">Complete</button>`
                 : ""
             }
             ${
               userData.id === groupData.createdBy
-                ? `<button data-id="${task._id}" class="remove-btn">X</button>`
+                ? `<button data-id="${task._id}" class="remove-button">X</button>`
                 : ""
             }
           </span>
@@ -35,7 +35,7 @@ const renderTasks = async (tasks) => {
     : "<strong>No tasks available.</strong>";
 
   // Add "Add Task" button if user is group creator
-  if (!document.querySelector("#add-task-btn")) {
+  if (!document.querySelector("#add-task-button")) {
     try {
       const response = await fetch("http://localhost:5000/api/groups", {
         headers: {
@@ -47,12 +47,12 @@ const renderTasks = async (tasks) => {
 
       const group = await response.json();
       if (group.createdBy === userData.id) {
-        const btn = document.createElement("button");
-        btn.id = "add-task-btn";
-        btn.className = "add-btn";
-        btn.textContent = "Add Task";
-        btn.onclick = () => openModal("addTaskModal");
-        document.querySelector(".tasks-card").appendChild(btn);
+        const button = document.createElement("button");
+        button.id = "add-task-button";
+        button.className = "add-button";
+        button.textContent = "Add Task";
+        button.onclick = () => openModal("addTaskModal");
+        document.querySelector(".tasks-card").appendChild(button);
       }
     } catch (err) {
       console.error(err);
@@ -60,18 +60,18 @@ const renderTasks = async (tasks) => {
   }
 
   // Confirm before completing a task
-  document.querySelectorAll(".complete-btn").forEach((button) =>
+  document.querySelectorAll(".complete-button").forEach((button) =>
     button.addEventListener("click", (e) => {
       openModal("confirmModal");
       document.getElementById("confirmHeader").textContent = "Mark Complete";
       document.getElementById("confirmMessage").textContent =
         "Are you sure you want to mark this task as complete?";
 
-      const yesBtn = document.getElementById("confirmYes");
-      const noBtn = document.getElementById("confirmNo");
+      const yesButton = document.getElementById("confirmYes");
+      const noButton = document.getElementById("confirmNo");
 
-      yesBtn.replaceWith(yesBtn.cloneNode(true));
-      noBtn.replaceWith(noBtn.cloneNode(true));
+      yesButton.replaceWith(yesButton.cloneNode(true));
+      noButton.replaceWith(noButton.cloneNode(true));
 
       document
         .getElementById("confirmYes")
@@ -83,18 +83,18 @@ const renderTasks = async (tasks) => {
   );
 
   // Confirm before removing a task
-  document.querySelectorAll(".remove-btn").forEach((button) =>
+  document.querySelectorAll(".remove-button").forEach((button) =>
     button.addEventListener("click", (e) => {
       openModal("confirmModal");
       document.getElementById("confirmHeader").textContent = "Confirm";
       document.getElementById("confirmMessage").textContent =
         "Are you sure you want to remove this task?";
 
-      const yesBtn = document.getElementById("confirmYes");
-      const noBtn = document.getElementById("confirmNo");
+      const yesButton = document.getElementById("confirmYes");
+      const noButton = document.getElementById("confirmNo");
 
-      yesBtn.replaceWith(yesBtn.cloneNode(true));
-      noBtn.replaceWith(noBtn.cloneNode(true));
+      yesButton.replaceWith(yesButton.cloneNode(true));
+      noButton.replaceWith(noButton.cloneNode(true));
 
       document
         .getElementById("confirmYes")
