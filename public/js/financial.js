@@ -53,7 +53,7 @@ const FinancialManager = {
   async getTransactions() {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/expenses/${groupData._id}`,
+        `http://localhost:5000/api/expenses`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
