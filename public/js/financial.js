@@ -52,15 +52,12 @@ const FinancialManager = {
   },
   async getTransactions() {
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/expenses`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch(`http://localhost:5000/api/expenses`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
       if (!response.ok) {
         throw new Error("Couldn't get transactions");
       }
@@ -89,7 +86,9 @@ const FinancialManager = {
           <td>${transaction.category}</td>
           <td class="${transaction.type}">$${transaction.amount.toFixed(2)}</td>
           <td>
-            <button data-id="${transaction._id}" id="remove-transaction" class="remove-button">X</button>
+            <button data-id="${
+              transaction._id
+            }" id="remove-transaction" class="remove-button">X</button>
           </td>
         </tr>
       `
@@ -139,6 +138,43 @@ const FinancialManager = {
     alert(message);
   },
 };
+
+// Notification Bell Functionality
+document.addEventListener("DOMContentLoaded", function () {
+  const notificationBell = document.getElementById("notificationBell");
+  const notificationDropdown = document.getElementById("notificationDropdown");
+  const markAllReadButton = document.querySelector(".mark-all-read");
+
+  // Toggle notification dropdown
+  notificationBell.addEventListener("click", function (e) {
+    e.stopPropagation();
+    notificationDropdown.classList.toggle("show");
+  });
+
+  // Close dropdown when clicking outside
+  document.addEventListener("click", function (e) {
+    if (
+      !notificationBell.contains(e.target) &&
+      !notificationDropdown.contains(e.target)
+    ) {
+      notificationDropdown.classList.remove("show");
+    }
+  });
+
+  // Mark all notifications as read
+  markAllReadButton.addEventListener("click", function () {
+    const unreadNotifications = document.querySelectorAll(
+      ".notification-item.unread"
+    );
+    unreadNotifications.forEach((notification) => {
+      notification.classList.remove("unread");
+    });
+    // Update badge count
+    const badge = document.querySelector(".notification-badge");
+    badge.textContent = "0";
+    badge.style.display = "none";
+  });
+});
 
 // Initialize the financial page when the DOM is loaded
 document.addEventListener("DOMContentLoaded", () => {

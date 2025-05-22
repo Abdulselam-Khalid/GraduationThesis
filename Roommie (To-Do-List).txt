@@ -5,3 +5,5 @@ Upcoming deadlines in dashboard page (Done)
 Start the financial side of the website (In Progress)
 Create the api to add and remove transactions (Done)
 Connect the add and remove transactions to the frontend
+Create notification system (In Progress)
+(Optional) Add AI chat field option

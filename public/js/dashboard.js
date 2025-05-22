@@ -13,20 +13,35 @@ const notifications = [
 
 const renderTasks = async (tasks) => {
   const list = document.getElementById("tasks-list");
-  list.innerHTML = tasks?.length 
-    ? tasks.slice(0, 4).map(task => `
+  list.innerHTML = tasks?.length
+    ? tasks
+        .slice(0, 4)
+        .map(
+          (task) => `
         <li>
           <span>
-            <input type="checkbox" disabled ${task.completed ? "checked" : ""} />
+            <input type="checkbox" disabled ${
+              task.completed ? "checked" : ""
+            } />
             <strong>${task.title}</strong><br />
             <small>${task.description || ""}</small>
           </span>
           <span style="font-size:0.95em;color:#3d5af1;">
-            ${task.status === "In Progress" ? "In Progress" : task.priority || ""}
-            ${task.due ? `<span style='color:#dc3545;margin-left:8px;'>Due: ${task.due}</span>` : ""}
+            ${
+              task.status === "In Progress"
+                ? "In Progress"
+                : task.priority || ""
+            }
+            ${
+              task.due
+                ? `<span style='color:#dc3545;margin-left:8px;'>Due: ${task.due}</span>`
+                : ""
+            }
           </span>
         </li>
-      `).join("")
+      `
+        )
+        .join("")
     : "<strong>No tasks available.</strong>";
 };
 const renderDeadlines = (tasks) => {
@@ -37,7 +52,7 @@ const renderDeadlines = (tasks) => {
 
   // Filter upcoming, incomplete tasks, then sort and limit to 3
   const upcomingTasks = tasks
-    .filter(task => {
+    .filter((task) => {
       const taskDate = new Date(task.dueDate);
       taskDate.setHours(0, 0, 0, 0);
       return !task.completed && taskDate >= currentDate;
@@ -46,7 +61,16 @@ const renderDeadlines = (tasks) => {
     .slice(0, 3);
 
   tbody.innerHTML = upcomingTasks.length
-    ? upcomingTasks.map(task => `<tr><td>${task.title}</td><td style="text-align:right;">${formatDate(task.dueDate)}</td></tr>`).join("")
+    ? upcomingTasks
+        .map(
+          (task) =>
+            `<tr><td>${
+              task.title
+            }</td><td style="text-align:right;">${formatDate(
+              task.dueDate
+            )}</td></tr>`
+        )
+        .join("")
     : `<tr><td style="text-align:center;">No upcoming deadlines</td></tr>`;
 };
 const renderActivities = () => {
@@ -101,4 +125,41 @@ const fetchAndRender = async () => {
 };
 document.addEventListener("DOMContentLoaded", async () => {
   fetchAndRender();
+});
+
+// Notification Bell Functionality
+document.addEventListener("DOMContentLoaded", function () {
+  const notificationBell = document.getElementById("notificationBell");
+  const notificationDropdown = document.getElementById("notificationDropdown");
+  const markAllReadButton = document.querySelector(".mark-all-read");
+
+  // Toggle notification dropdown
+  notificationBell.addEventListener("click", function (e) {
+    e.stopPropagation();
+    notificationDropdown.classList.toggle("show");
+  });
+
+  // Close dropdown when clicking outside
+  document.addEventListener("click", function (e) {
+    if (
+      !notificationBell.contains(e.target) &&
+      !notificationDropdown.contains(e.target)
+    ) {
+      notificationDropdown.classList.remove("show");
+    }
+  });
+
+  // Mark all notifications as read
+  markAllReadButton.addEventListener("click", function () {
+    const unreadNotifications = document.querySelectorAll(
+      ".notification-item.unread"
+    );
+    unreadNotifications.forEach((notification) => {
+      notification.classList.remove("unread");
+    });
+    // Update badge count
+    const badge = document.querySelector(".notification-badge");
+    badge.textContent = "0";
+    badge.style.display = "none";
+  });
 });

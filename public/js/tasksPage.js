@@ -227,6 +227,43 @@ const submitNewTask = () => {
   closeModal("addTaskModal");
 };
 
+// Notification Bell Functionality
+document.addEventListener("DOMContentLoaded", function () {
+  const notificationBell = document.getElementById("notificationBell");
+  const notificationDropdown = document.getElementById("notificationDropdown");
+  const markAllReadButton = document.querySelector(".mark-all-read");
+
+  // Toggle notification dropdown
+  notificationBell.addEventListener("click", function (e) {
+    e.stopPropagation();
+    notificationDropdown.classList.toggle("show");
+  });
+
+  // Close dropdown when clicking outside
+  document.addEventListener("click", function (e) {
+    if (
+      !notificationBell.contains(e.target) &&
+      !notificationDropdown.contains(e.target)
+    ) {
+      notificationDropdown.classList.remove("show");
+    }
+  });
+
+  // Mark all notifications as read
+  markAllReadButton.addEventListener("click", function () {
+    const unreadNotifications = document.querySelectorAll(
+      ".notification-item.unread"
+    );
+    unreadNotifications.forEach((notification) => {
+      notification.classList.remove("unread");
+    });
+    // Update badge count
+    const badge = document.querySelector(".notification-badge");
+    badge.textContent = "0";
+    badge.style.display = "none";
+  });
+});
+
 document.addEventListener("DOMContentLoaded", async () => {
   await fetchAndRender();
 });

@@ -29,6 +29,40 @@
         <header class="top-nav">
           <h1>Finances</h1>
           <div class="profile-menu">
+            <div class="notification-container">
+              <button
+                class="notification-bell fa-regular fa-bell"
+                id="notificationBell"
+              >
+                <span class="notification-badge">2</span>
+              </button>
+              <div class="notification-dropdown" id="notificationDropdown">
+                <div class="notification-header">
+                  <h3>Notifications</h3>
+                  <button class="mark-all-read">Mark all as read</button>
+                </div>
+                <div class="notification-list">
+                  <div class="notification-item unread">
+                    <div class="notification-content">
+                      <p>Rent payment due tomorrow</p>
+                      <span class="notification-time">1 hour ago</span>
+                    </div>
+                  </div>
+                  <div class="notification-item unread">
+                    <div class="notification-content">
+                      <p>Electricity bill has been paid</p>
+                      <span class="notification-time">2 hours ago</span>
+                    </div>
+                  </div>
+                  <div class="notification-item">
+                    <div class="notification-content">
+                      <p>New expense added: Groceries</p>
+                      <span class="notification-time">3 hours ago</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
             <span class="profile-name"></span>
             <button class="logout-button">Log out</button>
           </div>
@@ -78,7 +112,7 @@
           <option value="income">Income</option>
           <option value="expense">Expense</option>
         </select>
-        
+
         <input
           class="primaryInput"
           type="number"

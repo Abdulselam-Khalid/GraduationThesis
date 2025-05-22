@@ -4,9 +4,10 @@ const path = require("path");
 require("dotenv").config();
 const authRoutes = require("./routes/Auth");
 const taskRoutes = require("./routes/tasks");
-const groupRoutes = require('./routes/groups')
-const expenseRoutes = require('./routes/expenses')
-const cookieParser = require('cookie-parser')
+const groupRoutes = require("./routes/groups");
+const expenseRoutes = require("./routes/expenses");
+const notificationRoutes = require("./routes/notifications");
+const cookieParser = require("cookie-parser");
 
 const connectDB = require("./db/connect");
 
@@ -15,7 +16,7 @@ const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
-app.use(cookieParser())
+app.use(cookieParser());
 
 // Serve static files from the public directory
 app.use(express.static(path.join(__dirname, "public")));
@@ -30,7 +31,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/tasks", taskRoutes);
 app.use("/api/groups", groupRoutes);
 app.use("/api/expenses", expenseRoutes);
-
+app.use("/api/notifications", notificationRoutes);
 // Handle client-side routing
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "error404.html"));
