@@ -104,6 +104,23 @@
       </div>
     </div>
 
+    <!-- Alert Modal -->
+    <div id="alertModal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <h3 id="alertBody">Successful deleted the groups</h3>
+        <button class="confirm-button" id="okButton" onclick="closeModal('alertModal')">OK</button>
+      </div>
+    </div>
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="modal" style="display:none;">
+      <div class="modal-content">
+        <span class="close" onclick="closeModal('confirmModal')">&times;</span>
+        <h3 id="confirmHeader"></h3>
+        <p id="confirmMessage" style="margin: 10px;"></p>
+        <button class="confirm-button" id="confirmYes">Yes</button>
+        <button class="confirm-button" id="confirmNo">No</button>
+      </div>
+    </div>
     <!-- Load dashboard script after DOM is ready -->
     <script src="js/dashboard.js"></script>
     <script src="js/shared.js"></script>

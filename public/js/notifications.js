@@ -1,66 +1,59 @@
 const userId = userData.id;
+const notificationsMap = new Map(); // Store notifications by ID
 
 async function fetchNotifications() {
-  const dropdownList = document.querySelector(
-    "#notificationDropdown .notification-list"
-  );
+  const dropdownList = document.querySelector("#notificationDropdown .notification-list");
   const bellBadge = document.querySelector(".notification-badge");
-  const markAllReadButton = document.querySelector(".mark-all-read"); // ✅ Fixed selector (uses class)
+  const markAllReadButton = document.querySelector(".mark-all-read");
 
   try {
-    const res = await fetch(
-      `http://localhost:5000/api/notifications/user/${userId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const res = await fetch(`http://localhost:5000/api/notifications/user/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
 
     const notifications = await res.json();
-
-    // Clear previous entries
+    notificationsMap.clear();
     dropdownList.innerHTML = "";
 
-    // Only show unread notifications
-
     notifications.forEach((n) => {
+      notificationsMap.set(n._id, n);
+
       const ul = document.createElement("ul");
       ul.className = "notification-item unread";
-
       ul.innerHTML = `
-        <div class="notification-content">
+        <div class="notification-content" style="cursor:pointer" data-id="${n._id}">
           <p>${n.title}</p>
           <span class="notification-time">${formatTimeAgo(n.createdAt)}</span>
         </div>
       `;
-
       dropdownList.appendChild(ul);
     });
 
-    // Update the badge
     if (notifications.length > 0) {
       bellBadge.textContent = notifications.length;
       bellBadge.style.display = "flex";
     } else {
       bellBadge.style.display = "none";
+
       const ul = document.createElement("ul");
       ul.className = "notification-item unread";
-
       ul.innerHTML = `
         <div class="notification-content">
           <p>No new notifications</p>
         </div>
       `;
-
       dropdownList.appendChild(ul);
     }
 
-    // Mark all as read
-    markAllReadButton.addEventListener("click", () => {
-      markRead(notifications);
+    markAllReadButton.addEventListener("click", () => markRead(notifications, null));
+
+    document.querySelectorAll(".notification-content").forEach((div) => {
+      div.addEventListener("click", viewNotificationMessage);
     });
+
   } catch (err) {
     console.error("Error fetching notifications:", err);
   }
@@ -79,20 +72,50 @@ function formatTimeAgo(timestamp) {
   return `${days} day${days !== 1 ? "s" : ""} ago`;
 }
 
-const markRead = async (notifications) => {
+const markRead = async (notifications, notification) => {
   try {
-    for (const n of notifications) {
-      await fetch(`http://localhost:5000/api/notifications/${n._id}/read`, {
+    if (!notifications && notification) {
+      // Mark a single notification
+      await fetch(`http://localhost:5000/api/notifications/${notification._id}/read`, {
         method: "PATCH",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       });
+      closeModal("confirmModal");
+    } else {
+      // Mark all notifications
+      for (const n of notifications) {
+        await fetch(`http://localhost:5000/api/notifications/${n._id}/read`, {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+      }
     }
-    fetchNotifications(); // Refresh after marking as read
+
+    fetchNotifications(); // Refresh UI
   } catch (err) {
     console.error("Error marking notifications as read:", err);
+  }
+};
+
+const viewNotificationMessage = (e) => {
+  const id = e.currentTarget.dataset.id;
+  const notification = notificationsMap.get(id);
+
+  if (notification) {
+    showConfirmationModal({
+      message: notification.message,
+      onConfirm: () => markRead(null, notification),
+      confirmText: "Mark Read",
+      cancelText: "Cancel",
+    });
+  } else {
+    alert("No new notifications");
   }
 };
 
