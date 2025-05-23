@@ -34,32 +34,17 @@
                 class="notification-bell fa-regular fa-bell"
                 id="notificationBell"
               >
-                <span class="notification-badge">2</span>
+                <span class="notification-badge" id="notificationCount"></span>
               </button>
               <div class="notification-dropdown" id="notificationDropdown">
                 <div class="notification-header">
                   <h3>Notifications</h3>
-                  <button class="mark-all-read">Mark all as read</button>
+                  <button id="markAllReadButton" class="mark-all-read">
+                    Mark all as read
+                  </button>
                 </div>
-                <div class="notification-list">
-                  <div class="notification-item unread">
-                    <div class="notification-content">
-                      <p>Rent payment due tomorrow</p>
-                      <span class="notification-time">1 hour ago</span>
-                    </div>
-                  </div>
-                  <div class="notification-item unread">
-                    <div class="notification-content">
-                      <p>Electricity bill has been paid</p>
-                      <span class="notification-time">2 hours ago</span>
-                    </div>
-                  </div>
-                  <div class="notification-item">
-                    <div class="notification-content">
-                      <p>New expense added: Groceries</p>
-                      <span class="notification-time">3 hours ago</span>
-                    </div>
-                  </div>
+                <div class="notification-list" id="notificationList">
+                  <!-- Populated by JS -->
                 </div>
               </div>
             </div>
@@ -154,5 +139,6 @@
     ></script>
     <script src="js/financial.js"></script>
     <script src="js/shared.js"></script>
+    <script src="js/notifications.js"></script>
   </body>
 </html>
