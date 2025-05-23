@@ -64,12 +64,14 @@ window.onclick = function (event) {
   const createGroupModal = document.getElementById("createGroupModal");
   const confirmModal = document.getElementById("confirmModal");
   const alertModal = document.getElementById("alertModal");
+  const addTransactionModal = document.getElementById("addTransactionModal");
 
   if (event.target === addRoommateModal) closeModal("addRoommateModal");
   if (event.target === createGroupModal) closeModal("createGroupModal");
   if (event.target === addTaskModal) closeModal("addTaskModal");
   if (event.target === confirmModal) closeModal("confirmModal");
   if (event.target === alertModal) closeModal("alertModal");
+  if (event.target === addTransactionModal) closeModal("addTransactionModal");
 };
 document.addEventListener("DOMContentLoaded", async () => {
   await groups();

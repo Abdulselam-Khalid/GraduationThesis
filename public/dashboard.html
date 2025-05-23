@@ -7,6 +7,10 @@
     <link rel="stylesheet" href="/css/styles.css" />
     <!-- Load Auth module first -->
     <script src="/js/auth.js"></script>
+    <script
+      src="https://kit.fontawesome.com/0e39b0b64f.js"
+      crossorigin="anonymous"
+    ></script>
   </head>
   <body>
     <div class="dashboard-root">
@@ -29,8 +33,27 @@
         <header class="top-nav">
           <h1>Welcome to ROOMIE</h1>
           <div class="profile-menu">
+            <div class="notification-container">
+              <button
+                class="notification-bell fa-regular fa-bell"
+                id="notificationBell"
+              >
+                <span class="notification-badge" id="notificationCount"></span>
+              </button>
+              <div class="notification-dropdown" id="notificationDropdown">
+                <div class="notification-header">
+                  <h3>Notifications</h3>
+                  <button id="markAllReadButton" class="mark-all-read">
+                    Mark all as read
+                  </button>
+                </div>
+                <div class="notification-list" id="notificationList">
+                  <!-- Populated by JS -->
+                </div>
+              </div>
+            </div>
             <span class="profile-name"></span>
-            <button class="logout-btn">Log out</button>
+            <button class="logout-button">Log out</button>
           </div>
         </header>
 
@@ -84,5 +107,6 @@
     <!-- Load dashboard script after DOM is ready -->
     <script src="js/dashboard.js"></script>
     <script src="js/shared.js"></script>
+    <script src="js/notifications.js"></script>
   </body>
 </html>

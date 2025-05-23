@@ -28,7 +28,9 @@ const renderMembers = async (group) => {
               isAdmin
                 ? `<td>${
                     canRemove
-                      ? `<button id="remove-member" class="remove-btn" data-group-id="${group._id}" data-id="${member._id}">X</button>`
+
+                      ? `<button id="remove-member" class="remove-button" data-group-id="${group._id}" data-id="${member._id}">X</button>`
+
                       : "—"
                   }</td>`
                 : ""
@@ -53,12 +55,14 @@ const renderMembers = async (group) => {
   };
 
   if (isAdmin) {
-    addButton("add-roommate-button", "Add Roommate", "add-btn", () =>
+
+    addButton("add-roommate-button", "Add Roommate", "add-button", () =>
+
       openModal("addRoommateModal")
     );
   }
 
-  addButton("leave-group-button", "Leave Group", "leave-btn", () => {
+  addButton("leave-group-button", "Leave Group", "leave-button", () => {
     showConfirmationModal({
       message: `Are you sure you want to leave "${group.name}"?`,
       onConfirm: () => leaveGroup(group),
@@ -95,9 +99,10 @@ const renderTasks = (tasks, group) => {
     const isPastDeadline = taskDate < currentDate;
     const deadlineStyle = isPastDeadline ? "color: red;" : "";
 
-    const showCompleteBtn =
+    const showCompleteButton =
       task.assignedTo._id === userData.id && !task.completed;
-    const showRemoveBtn = isAdmin;
+    const showRemoveButton = isAdmin;
+
 
     li.innerHTML = `
       <span>
@@ -113,13 +118,13 @@ const renderTasks = (tasks, group) => {
             : `<strong style="${deadlineStyle}">${formatDate(task.dueDate)}</strong>`
         }
         ${
-          showCompleteBtn
-            ? `<button data-id="${task._id}" class="complete-btn">Complete</button>`
+          showCompleteButton
+            ? `<button data-id="${task._id}" class="complete-button">Complete</button>`
             : ""
         }
         ${
-          showRemoveBtn
-            ? `<button data-id="${task._id}" id="remove-task" class="remove-btn">X</button>`
+          showRemoveButton
+            ? `<button data-id="${task._id}" id="remove-task" class="remove-button">X</button>`
             : ""
         }
       </span>
@@ -129,11 +134,12 @@ const renderTasks = (tasks, group) => {
   });
 
   // Add Task button for admins only
-  if (!document.querySelector("#add-task-btn") && isAdmin) {
+
+  if (!document.querySelector("#add-task-button") && isAdmin) {
     const button = document.createElement("button");
     button.textContent = "Add Task";
-    button.className = "add-btn";
-    button.id = "add-task-btn";
+    button.className = "add-button";
+    button.id = "add-task-button";
     document.querySelector(".tasks-card").appendChild(button);
 
     button.addEventListener("click", () => {
@@ -159,11 +165,11 @@ const renderTasks = (tasks, group) => {
 
   // Event listeners
   document
-    .querySelectorAll(".complete-btn")
-    .forEach((btn) => btn.addEventListener("click", completeTask));
+    .querySelectorAll(".complete-button")
+    .forEach((button) => button.addEventListener("click", completeTask));
 
-  document.querySelectorAll("#remove-task").forEach((btn) =>
-    btn.addEventListener("click", (e) => {
+  document.querySelectorAll("#remove-task").forEach((button) =>
+    button.addEventListener("click", (e) => {
       showConfirmationModal({
         message: "Are you sure you want to remove this task?",
         onConfirm: () => removeTask(e),
@@ -207,12 +213,14 @@ const fetchAndRender = async () => {
         "<p>No group found. Please join or create a group.</p>";
       tasksList.innerHTML = "<p>No tasks to show.</p>";
 
-      const createBtn = document.createElement("button");
-      createBtn.className = "add-btn";
-      createBtn.id = "create-button";
-      createBtn.textContent = "Create Group";
-      namesCard.appendChild(createBtn);
-      createBtn.addEventListener("click", () =>
+
+      const createButton = document.createElement("button");
+      createButton.className = "add-button";
+      createButton.id = "create-button";
+      createButton.textContent = "Create Group";
+      namesCard.appendChild(createButton);
+      createButton.addEventListener("click", () =>
+
         openModal("createGroupModal")
       );
 
@@ -239,7 +247,7 @@ const fetchAndRender = async () => {
     if (!tasksRes.ok) throw new Error("Failed to fetch tasks");
 
     const tasks = await tasksRes.json();
-    removeOldTasks(tasks)
+    removeOldTasks(tasks);
     renderTasks(tasks, group);
   } catch (error) {
     console.error("Error loading tasks or members:", error);
@@ -316,16 +324,13 @@ const removeTask = async (e, task) => {
     const taskId = e?.target?.dataset?.id ?? task?._id;
     if (!taskId) throw new Error("Task ID not found");
 
-    const response = await fetch(
-      `http://localhost:5000/api/tasks/${taskId}`,
-      {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await fetch(`http://localhost:5000/api/tasks/${taskId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
 
     if (!response.ok) throw new Error("Failed to delete task");
 
@@ -397,7 +402,7 @@ const deleteGroup = async (groups) => {
     alert(`You have left "${groups.name}" and the group has been deleted.`);
 
     // Remove buttons efficiently
-    ["leave-group-button", "add-roommate-button", "add-task-btn"].forEach(
+    ["leave-group-button", "add-roommate-button", "add-task-button"].forEach(
       (id) => document.getElementById(id)?.remove()
     );
 
@@ -524,10 +529,48 @@ const removeOldTasks = (tasks) => {
 
   tasks.forEach((task) => {
     if (new Date(task.createdAt) <= cutoffDate && task.completed === true) {
-      removeTask(null, task)
+
+      removeTask(null, task);
     }
   });
 };
+
+// Notification Bell Functionality
+document.addEventListener("DOMContentLoaded", function () {
+  const notificationBell = document.getElementById("notificationBell");
+  const notificationDropdown = document.getElementById("notificationDropdown");
+  const markAllReadButton = document.querySelector(".mark-all-read");
+
+  // Toggle notification dropdown
+  notificationBell.addEventListener("click", function (e) {
+    e.stopPropagation();
+    notificationDropdown.classList.toggle("show");
+  });
+
+  // Close dropdown when clicking outside
+  document.addEventListener("click", function (e) {
+    if (
+      !notificationBell.contains(e.target) &&
+      !notificationDropdown.contains(e.target)
+    ) {
+      notificationDropdown.classList.remove("show");
+    }
+  });
+
+  // Mark all notifications as read
+  markAllReadButton.addEventListener("click", function () {
+    const unreadNotifications = document.querySelectorAll(
+      ".notification-item.unread"
+    );
+    unreadNotifications.forEach((notification) => {
+      notification.classList.remove("unread");
+    });
+    // Update badge count
+    const badge = document.querySelector(".notification-badge");
+    badge.textContent = "0";
+    badge.style.display = "none";
+  });
+});
 
 document.addEventListener("DOMContentLoaded", async () => {
   await fetchAndRender();

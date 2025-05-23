@@ -236,7 +236,7 @@ body {
   color: #232946;
 }
 
-.logout-btn {
+.logout-button {
   background: #eebbc3;
   color: #232946;
   border: none;
@@ -247,7 +247,7 @@ body {
   transition: all 0.3s ease;
 }
 
-.logout-btn:hover {
+.logout-button:hover {
   background: #d1d5db;
 }
 
@@ -303,7 +303,7 @@ body {
   margin-bottom: 0.7rem;
   font-size: 1rem;
 }
-.add-btn {
+.add-button {
   background: #3d5af1;
   color: #fff;
   border: none;
@@ -314,10 +314,10 @@ body {
   align-self: flex-end;
   transition: background 0.3s;
 }
-.add-btn:hover {
+.add-button:hover {
   background: #232946;
 }
-.confirm-btn {
+.confirm-button {
   background-color: hsl(0, 0%, 50%);
   color: #fff;
   border: none;
@@ -328,10 +328,10 @@ body {
   align-self: flex-end;
   transition: background 0.3s;
 }
-.confirm-btn:hover {
+.confirm-button:hover {
   background-color: hsl(0, 0%, 40%);
 }
-.complete-btn {
+.complete-button {
   background: hsl(118, 90%, 40%);
   color: #fff;
   border: none;
@@ -342,10 +342,10 @@ body {
   align-self: flex-end;
   transition: background 0.3s;
 }
-.complete-btn:hover {
+.complete-button:hover {
   background: hsl(118, 90%, 30%);
 }
-.finished-task-btn {
+.finished-task-button {
   background: #a3ffa3;
   color: black;
   border: none;
@@ -434,8 +434,8 @@ body {
   background-color: #f4f4f4;
 }
 
-.remove-btn,
-.leave-btn {
+.remove-button,
+.leave-button {
   background: hsl(0, 100%, 50%);
   color: #fff;
   border: none;
@@ -446,12 +446,12 @@ body {
   align-self: flex-end;
   transition: background 0.3s;
 }
-.leave-btn {
+.leave-button {
   border-radius: 6px;
   margin-top: 10px;
 }
-.remove-btn:hover,
-.leave-btn:hover {
+.remove-button:hover,
+.leave-button:hover {
   background-color: hsl(0, 100%, 40%);
 }
 .modal {
@@ -483,7 +483,9 @@ body {
   cursor: pointer;
 }
 /* --- Financial --- */
-.toggle-btn {
+
+.toggle-button {
+
   padding: 10px 20px;
   margin: 10px;
   font-size: 18px;
@@ -496,7 +498,9 @@ body {
   transition: background 0.3s ease;
 }
 
-.toggle-btn:hover {
+
+.toggle-button:hover {
+
   background: #0056b3;
 }
 /* --- Responsive --- */
@@ -573,5 +577,130 @@ body {
 
   .sidebar-nav {
     display: none;
+  }
+}
+
+/* Notification Styles */
+.notification-container {
+  position: relative;
+}
+
+.notification-bell {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  color: #232946;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+}
+
+.notification-bell:hover {
+  color: #eebbc3;
+}
+
+.notification-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: #eebbc3;
+  color: #232946;
+  font-size: 0.75rem;
+  font-weight: bold;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.notification-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 320px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-top: 0.5rem;
+  display: none;
+  z-index: 1000;
+}
+
+.notification-dropdown.show {
+  display: block;
+}
+
+.notification-header {
+  padding: 1rem;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.notification-header h3 {
+  margin: 0;
+  color: #232946;
+  font-size: 1rem;
+}
+
+.mark-all-read {
+  background: none;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.mark-all-read:hover {
+  text-decoration: underline;
+}
+
+.notification-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.notification-item {
+  padding: 1rem;
+  border-bottom: 1px solid #e0e0e0;
+  transition: background-color 0.2s;
+}
+
+.notification-item:hover {
+  background-color: #f5f6fa;
+}
+
+.notification-item.unread {
+  background-color: #f8f9fa;
+}
+
+.notification-content p {
+  margin: 0;
+  color: #232946;
+  font-size: 0.875rem;
+}
+
+.notification-time {
+  display: block;
+  color: #6c757d;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+@media (max-width: 768px) {
+  .notification-dropdown {
+    position: fixed;
+    top: 60px;
+    left: 0;
+    right: 0;
+    width: 100%;
+    margin: 0;
+    border-radius: 0;
   }
 }
