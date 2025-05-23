@@ -483,7 +483,9 @@ body {
   cursor: pointer;
 }
 /* --- Financial --- */
+
 .toggle-button {
+
   padding: 10px 20px;
   margin: 10px;
   font-size: 18px;
@@ -496,7 +498,9 @@ body {
   transition: background 0.3s ease;
 }
 
+
 .toggle-button:hover {
+
   background: #0056b3;
 }
 /* --- Responsive --- */

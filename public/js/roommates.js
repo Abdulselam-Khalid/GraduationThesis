@@ -28,7 +28,9 @@ const renderMembers = async (group) => {
               isAdmin
                 ? `<td>${
                     canRemove
+
                       ? `<button id="remove-member" class="remove-button" data-group-id="${group._id}" data-id="${member._id}">X</button>`
+
                       : "—"
                   }</td>`
                 : ""
@@ -53,7 +55,9 @@ const renderMembers = async (group) => {
   };
 
   if (isAdmin) {
+
     addButton("add-roommate-button", "Add Roommate", "add-button", () =>
+
       openModal("addRoommateModal")
     );
   }
@@ -99,6 +103,7 @@ const renderTasks = (tasks, group) => {
       task.assignedTo._id === userData.id && !task.completed;
     const showRemoveButton = isAdmin;
 
+
     li.innerHTML = `
       <span>
         <input type="checkbox" disabled ${task.completed ? "checked" : ""} />
@@ -110,9 +115,7 @@ const renderTasks = (tasks, group) => {
         ${
           task.completed
             ? "<strong>Done</strong>"
-            : `<strong style="${deadlineStyle}">${formatDate(
-                task.dueDate
-              )}</strong>`
+            : `<strong style="${deadlineStyle}">${formatDate(task.dueDate)}</strong>`
         }
         ${
           showCompleteButton
@@ -131,6 +134,7 @@ const renderTasks = (tasks, group) => {
   });
 
   // Add Task button for admins only
+
   if (!document.querySelector("#add-task-button") && isAdmin) {
     const button = document.createElement("button");
     button.textContent = "Add Task";
@@ -209,12 +213,14 @@ const fetchAndRender = async () => {
         "<p>No group found. Please join or create a group.</p>";
       tasksList.innerHTML = "<p>No tasks to show.</p>";
 
+
       const createButton = document.createElement("button");
       createButton.className = "add-button";
       createButton.id = "create-button";
       createButton.textContent = "Create Group";
       namesCard.appendChild(createButton);
       createButton.addEventListener("click", () =>
+
         openModal("createGroupModal")
       );
 
@@ -523,6 +529,7 @@ const removeOldTasks = (tasks) => {
 
   tasks.forEach((task) => {
     if (new Date(task.createdAt) <= cutoffDate && task.completed === true) {
+
       removeTask(null, task);
     }
   });
