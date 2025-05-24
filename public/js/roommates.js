@@ -301,7 +301,7 @@ const completeTask = async (e) => {
     const response = await fetch(
       `http://localhost:5000/api/tasks/${e.target.dataset.id}`,
       {
-        method: "PUT",
+        method: "PATCH",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",

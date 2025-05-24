@@ -121,4 +121,5 @@ const viewNotificationMessage = (e) => {
 
 document.addEventListener("DOMContentLoaded", () => {
   fetchNotifications();
+  setInterval(fetchNotifications, 60000);
 });

@@ -43,7 +43,31 @@ const getUserNotifications = async (req, res) => {
       .json({ message: "Failed to fetch notifications", error: error.message });
   }
 };
+const getGroupNotifications = async (req, res) => {
+  const {groupId} = req.params;
 
+  try {
+    // Step 1: Delete read notifications older than 5 days
+    const fiveDaysAgo = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000);
+
+    await Notification.deleteMany({
+      groupId,
+      createdAt: { $lte: fiveDaysAgo },
+    });
+
+    // Step 2: Fetch remaining (unread) notifications
+    const notifications = await Notification.find({
+      groupId
+    }).sort({ createdAt: -1 });
+
+    res.status(200).json(notifications);
+  } catch (error) {
+    console.error("Error fetching notifications:", error);
+    res
+      .status(500)
+      .json({ message: "Failed to fetch notifications", error: error.message });
+  }
+};
 // ✅ Mark a notification as read (set isRead=true and readAt=current date)
 const markNotificationRead = async (req, res) => {
   const notificationId = req.params.id;
@@ -92,6 +116,7 @@ const deleteNotification = async (req, res) => {
 module.exports = {
   createNotification,
   getUserNotifications,
+  getGroupNotifications,
   markNotificationRead,
   deleteNotification,
 };

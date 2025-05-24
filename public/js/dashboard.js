@@ -1,7 +1,3 @@
-const activities = [
-  { text: 'Ali marked "Vacuum living room" as done' },
-  { text: 'Sara added a new task: "Fix leaky faucet"' },
-];
 const expenses = [
   { text: "Sara paid $40 for groceries. Ali owes $20." },
   { text: "Abdulseslam paid $60 for utilities. Sara owes $30." },
@@ -42,7 +38,7 @@ const renderTasks = async (tasks) => {
       `
         )
         .join("")
-    : "<strong>No tasks available.</strong>";
+    : "<p>No tasks available.</p>";
 };
 const renderDeadlines = (tasks) => {
   if (!tasks || !Array.isArray(tasks)) return;
@@ -73,15 +69,30 @@ const renderDeadlines = (tasks) => {
         .join("")
     : `<tr><td style="text-align:center;">No upcoming deadlines</td></tr>`;
 };
-const renderActivities = () => {
+const renderActivities = async () => {
   const list = document.getElementById("activity-list");
-  list.innerHTML = "";
-  activities.forEach((act) => {
-    const li = document.createElement("li");
-    li.textContent = act.text;
-    list.appendChild(li);
-  });
+
+  try {
+    const response = await fetch(
+      `http://localhost:5000/api/notifications/group/${groupData._id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    let activities = await response.json();
+    activities = activities.slice(0, 3);
+
+    list.innerHTML = activities.length
+      ? activities.map((act) => `<li>${act.message}</li>`).join("")
+      : `<p style="text-align:center;">No new activities</p>`;
+  } catch (error) {
+    list.innerHTML = `<p style="text-align:center;">No new activities</p>`;
+  }
 };
+
 const renderExpenses = () => {
   const list = document.getElementById("expenses-list");
   list.innerHTML = "";
