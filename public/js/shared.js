@@ -83,6 +83,57 @@ window.onclick = function (event) {
   if (event.target === alertModal) closeModal("alertModal");
   if (event.target === addTransactionModal) closeModal("addTransactionModal");
 };
+const fetchAndStoreImage = async () => {
+  try {
+    const response = await fetch(`http://localhost:5000/api/uploads`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) throw new Error("Failed to fetch image");
+
+    const blob = await response.blob();
+    const base64String = await blobToBase64(blob);
+
+    // Update image source immediately
+    document.getElementById("faceavatar").src = base64String;
+
+    // Store image in sessionStorage to avoid delays
+    sessionStorage.setItem("image", base64String);
+  } catch (error) {
+    console.error("Error fetching image:", error);
+
+    // Provide a fallback avatar in case of failure
+    document.getElementById("faceavatar").src = "/assets/pfp.png";
+  }
+};
+
+// Convert Blob to Base64
+const blobToBase64 = (blob) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+};
+
+// Load image instantly from cache if available
+document.addEventListener("DOMContentLoaded", () => {
+  const storedImage = sessionStorage.getItem("image");
+  if (storedImage) {
+    document.getElementById("faceavatar").src = storedImage;
+  } else {
+    fetchAndStoreImage();
+  }
+});
+
+
 document.addEventListener("DOMContentLoaded", async () => {
   await groups();
+  fetchAndStoreImage()
+  document.getElementById("faceavatar").addEventListener("error", function() {
+    this.src = "/assets/pfp.png"; // Fallback image
+  });
 });

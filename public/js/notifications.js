@@ -2,17 +2,22 @@ const userId = userData.id;
 const notificationsMap = new Map(); // Store notifications by ID
 
 async function fetchNotifications() {
-  const dropdownList = document.querySelector("#notificationDropdown .notification-list");
+  const dropdownList = document.querySelector(
+    "#notificationDropdown .notification-list"
+  );
   const bellBadge = document.querySelector(".notification-badge");
   const markAllReadButton = document.querySelector(".mark-all-read");
 
   try {
-    const res = await fetch(`http://localhost:5000/api/notifications/user/${userId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    });
+    const res = await fetch(
+      `http://localhost:5000/api/notifications/user/${userId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
     const notifications = await res.json();
     notificationsMap.clear();
@@ -24,7 +29,9 @@ async function fetchNotifications() {
       const ul = document.createElement("ul");
       ul.className = "notification-item unread";
       ul.innerHTML = `
-        <div class="notification-content" style="cursor:pointer" data-id="${n._id}">
+        <div class="notification-content" style="cursor:pointer" data-id="${
+          n._id
+        }">
           <p>${n.title}</p>
           <span class="notification-time">${formatTimeAgo(n.createdAt)}</span>
         </div>
@@ -48,12 +55,13 @@ async function fetchNotifications() {
       dropdownList.appendChild(ul);
     }
 
-    markAllReadButton.addEventListener("click", () => markRead(notifications, null));
+    markAllReadButton.addEventListener("click", () =>
+      markRead(notifications, null)
+    );
 
     document.querySelectorAll(".notification-content").forEach((div) => {
       div.addEventListener("click", viewNotificationMessage);
     });
-
   } catch (err) {
     console.error("Error fetching notifications:", err);
   }
@@ -76,13 +84,16 @@ const markRead = async (notifications, notification) => {
   try {
     if (!notifications && notification) {
       // Mark a single notification
-      await fetch(`http://localhost:5000/api/notifications/${notification._id}/read`, {
-        method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      await fetch(
+        `http://localhost:5000/api/notifications/${notification._id}/read`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
       closeModal("confirmModal");
     } else {
       // Mark all notifications

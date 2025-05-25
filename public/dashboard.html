@@ -17,7 +17,12 @@
       <!-- Sidebar -->
       <aside class="sidebar">
         <div class="sidebar-logo">
-          <img class="faceavatar" src="/assets/logo.png" alt="Logo" />
+          <img
+            class="faceavatar"
+            id="faceavatar"
+            src="/assets/pfp.png"
+            alt="Profile Picture"
+          />
         </div>
         <nav class="sidebar-nav">
           <a href="dashboard.html" class="active">Dashboard</a>
@@ -86,10 +91,13 @@
           </section>
 
           <!-- Zen Corner -->
-          <section class="card zen-corner-card">
-            <h2>🧘 Zen Corner</h2>
-            <p id="zen-quote">"A clean room is a calm mind." – Unknown</p>
+          <section class="card zen-card">
+            <h2>Zen Corner</h2>
+            <blockquote id="zen-quote">Loading quote...</blockquote>
+            <p id="zen-author"></p>
           </section>
+
+          <input type="file" id="fileInput" />
         </div>
       </div>
     </div>
@@ -118,8 +126,8 @@
       </div>
     </div>
     <!-- Load dashboard script after DOM is ready -->
-    <script src="js/dashboard.js"></script>
     <script src="js/shared.js"></script>
+    <script src="js/dashboard.js"></script>
     <script src="js/notifications.js"></script>
   </body>
 </html>
