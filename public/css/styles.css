@@ -284,6 +284,17 @@ body {
   color: #232946;
   font-weight: 600;
 }
+.zen-corner-card {
+  background-color: hsl(120, 61%, 84%);
+  border-left: 5px solid #76c7c0;
+  font-style: italic;
+  font-family: 'Georgia', serif;
+  padding: 1rem;
+}
+.zen-corner-card h2 {
+  margin-bottom: 0.5rem;
+}
+
 
 /* --- Tasks --- */
 .tasks-card ul,

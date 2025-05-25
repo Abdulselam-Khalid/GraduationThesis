@@ -3,7 +3,7 @@ const token = sessionStorage.getItem("token");
 const userData = JSON.parse(sessionStorage.getItem("userData"));
 const groupData = JSON.parse(sessionStorage.getItem("groupData"));
 const usernameElement = document.querySelector(".profile-name");
-let userName = userData.name
+let userName = userData.name;
 
 if (usernameElement && userName) {
   usernameElement.innerHTML = userName;
@@ -23,15 +23,18 @@ const groups = async () => {
   } catch (error) {}
 };
 function openModal(modalId) {
-  document.getElementById(modalId).style.display = "block";
+  const modal = document.getElementById(modalId);
+  modal.style.display = "block";
+  modal.setAttribute("tabindex", "-1");
+  modal.focus();
 }
 function closeModal(modalId) {
   document.getElementById(modalId).style.display = "none";
 }
 const alert = (message) => {
-  openModal("alertModal")
-  document.getElementById("alertBody").textContent = message
-}
+  openModal("alertModal");
+  document.getElementById("alertBody").textContent = message;
+};
 const formatDate = (dueDate) => {
   if (!dueDate) return;
   const formattedDate = new Date(dueDate).toLocaleDateString("en-US", {
@@ -41,13 +44,18 @@ const formatDate = (dueDate) => {
   });
   return formattedDate;
 };
-const showConfirmationModal = ({ message, confirmText = "Yes", cancelText = "No", onConfirm }) => {
+const showConfirmationModal = ({
+  message,
+  confirmText = "Yes",
+  cancelText = "No",
+  onConfirm,
+}) => {
   openModal("confirmModal");
-  
+
   document.getElementById("confirmHeader").textContent = "Confirm";
   document.getElementById("confirmMessage").textContent = message;
 
-  ["confirmYes", "confirmNo"].forEach(id => {
+  ["confirmYes", "confirmNo"].forEach((id) => {
     const button = document.getElementById(id);
     button.replaceWith(button.cloneNode(true)); // Prevent duplicate listeners
   });
@@ -56,7 +64,9 @@ const showConfirmationModal = ({ message, confirmText = "Yes", cancelText = "No"
   document.getElementById("confirmNo").textContent = cancelText;
 
   document.getElementById("confirmYes").addEventListener("click", onConfirm);
-  document.getElementById("confirmNo").addEventListener("click", () => closeModal("confirmModal"));
+  document
+    .getElementById("confirmNo")
+    .addEventListener("click", () => closeModal("confirmModal"));
 };
 window.onclick = function (event) {
   const addRoommateModal = document.getElementById("addRoommateModal");

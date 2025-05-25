@@ -93,24 +93,20 @@ const renderActivities = async () => {
   }
 };
 
-const renderExpenses = () => {
-  const list = document.getElementById("expenses-list");
-  list.innerHTML = "";
-  expenses.forEach((exp) => {
-    const li = document.createElement("li");
-    li.textContent = exp.text;
-    list.appendChild(li);
-  });
-};
-const renderNotifications = () => {
-  const list = document.getElementById("notifications-list");
-  list.innerHTML = "";
-  notifications.forEach((note) => {
-    const li = document.createElement("li");
-    li.textContent = note.text;
-    list.appendChild(li);
-  });
-};
+const zenQuotes = [
+  '"A clean room is a calm mind." – Unknown',
+  '"The best way out is always through." – Robert Frost',
+  '"Less mess, less stress." – Roommate Wisdom',
+  '"Clean space, clear mind." – Ancient Roommate Proverb',
+  '"Harmony begins with hygiene." – Possibly Confucius'
+];
+
+document.addEventListener("DOMContentLoaded", () => {
+  const quote = zenQuotes[Math.floor(Math.random() * zenQuotes.length)];
+  document.getElementById("zen-quote").textContent = quote;
+});
+
+
 const fetchAndRender = async () => {
   try {
     const response = await fetch("http://localhost:5000/api/tasks", {
@@ -131,8 +127,6 @@ const fetchAndRender = async () => {
     console.error({ error: error.message });
   }
   renderActivities();
-  renderExpenses();
-  renderNotifications();
 };
 document.addEventListener("DOMContentLoaded", async () => {
   fetchAndRender();

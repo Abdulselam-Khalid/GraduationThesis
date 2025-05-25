@@ -1,9 +1,17 @@
 const renderTasks = async (tasks) => {
   const list = document.getElementById("tasks-list");
+  const currentDate = new Date();
+  currentDate.setHours(0, 0, 0, 0); // Normalize time
+
   list.innerHTML = tasks?.length
     ? tasks
-        .map(
-          (task) => `
+        .map((task) => {
+          const taskDate = new Date(task.dueDate);
+          taskDate.setHours(0, 0, 0, 0);
+          const isPastDeadline = taskDate < currentDate;
+          const deadlineStyle = isPastDeadline ? "color: red;" : "";
+
+          return `
         <li>
           <span>
             <input type="checkbox" disabled ${
@@ -16,7 +24,9 @@ const renderTasks = async (tasks) => {
             ${
               task.completed
                 ? "<strong>Done</strong>"
-                : `<strong>${formatDate(task.dueDate) || ""}</strong>`
+                : `<strong style="${deadlineStyle}">${
+                    formatDate(task.dueDate) || ""
+                  }</strong>`
             }
             ${
               !task.completed
@@ -29,8 +39,8 @@ const renderTasks = async (tasks) => {
                 : ""
             }
           </span>
-        </li>`
-        )
+        </li>`;
+        })
         .join("")
     : "<strong>No tasks available.</strong>";
 
@@ -105,6 +115,7 @@ const renderTasks = async (tasks) => {
     })
   );
 };
+
 const fetchAndRender = async () => {
   if (!token) return (window.location.href = "/login.html");
 

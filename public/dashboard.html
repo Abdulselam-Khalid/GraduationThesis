@@ -20,7 +20,7 @@
           <img class="faceavatar" src="/assets/logo.png" alt="Logo" />
         </div>
         <nav class="sidebar-nav">
-          <a href="#" class="active">Dashboard</a>
+          <a href="dashboard.html" class="active">Dashboard</a>
           <a href="roommates.html">Roommates</a>
           <a href="tasks.html">Tasks</a>
           <a href="financial.html">Financial</a>
@@ -85,38 +85,34 @@
             </ul>
           </section>
 
-          <!-- Expenses Overview -->
-          <section class="card expenses-card">
-            <h2>Expenses Overview</h2>
-            <ul id="expenses-list">
-              <!-- Populated by JS -->
-            </ul>
-          </section>
-
-          <!-- Notifications -->
-          <section class="card notifications-card">
-            <h2>Notifications</h2>
-            <ul id="notifications-list">
-              <!-- Populated by JS -->
-            </ul>
+          <!-- Zen Corner -->
+          <section class="card zen-corner-card">
+            <h2>🧘 Zen Corner</h2>
+            <p id="zen-quote">"A clean room is a calm mind." – Unknown</p>
           </section>
         </div>
       </div>
     </div>
 
     <!-- Alert Modal -->
-    <div id="alertModal" class="modal" style="display: none;">
+    <div id="alertModal" class="modal" style="display: none">
       <div class="modal-content">
         <h3 id="alertBody">Successful deleted the groups</h3>
-        <button class="confirm-button" id="okButton" onclick="closeModal('alertModal')">OK</button>
+        <button
+          class="confirm-button"
+          id="okButton"
+          onclick="closeModal('alertModal')"
+        >
+          OK
+        </button>
       </div>
     </div>
     <!-- Confirmation Modal -->
-    <div id="confirmModal" class="modal" style="display:none;">
+    <div id="confirmModal" class="modal" style="display: none">
       <div class="modal-content">
         <span class="close" onclick="closeModal('confirmModal')">&times;</span>
         <h3 id="confirmHeader"></h3>
-        <p id="confirmMessage" style="margin: 10px;"></p>
+        <p id="confirmMessage" style="margin: 10px"></p>
         <button class="confirm-button" id="confirmYes">Yes</button>
         <button class="confirm-button" id="confirmNo">No</button>
       </div>
