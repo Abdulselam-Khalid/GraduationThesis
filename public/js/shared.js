@@ -129,11 +129,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-
 document.addEventListener("DOMContentLoaded", async () => {
   await groups();
-  fetchAndStoreImage()
-  document.getElementById("faceavatar").addEventListener("error", function() {
+  fetchAndStoreImage();
+  document.getElementById("faceavatar").addEventListener("error", function () {
     this.src = "/assets/pfp.png"; // Fallback image
   });
 });

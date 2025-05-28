@@ -97,8 +97,47 @@
             <p id="zen-author"></p>
           </section>
 
-          <input type="file" id="fileInput" />
-        </div>
+          <!-- AI Chat Bubble -->
+          <div class="chat-bubble" id="chatBubble">
+            <div class="chat-bubble-header" id="chatBubbleHeader">
+              <div class="chat-bubble-title">
+                <i class="fas fa-robot"></i>
+                <span>AI Assistant</span>
+              </div>
+              <button class="chat-bubble-close" id="chatBubbleClose">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+            <div class="chat-container" id="chatContainer">
+              <div class="chat-messages" id="chatMessages">
+                <!-- Messages will be dynamically added here -->
+              </div>
+              <div class="chat-input-container">
+                <input
+                  type="text"
+                  class="primaryInput chat-input"
+                  id="aiPrompt"
+                  placeholder="Type your message..."
+                  autofocus
+                />
+                <button
+                  class="add-button"
+                  id="ai-button"
+                  onclick="fetchAiResponse()"
+                >
+                  <i class="fas fa-paper-plane"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Upload Picture -->
+          <!-- 
+          <section class="card file-input">
+            <h2>Upload Image</h2>
+            <input type="file" class="primaryInput" id="fileInput" />
+          </section>
+        --></div>
       </div>
     </div>
 
@@ -126,6 +165,16 @@
       </div>
     </div>
     <!-- Load dashboard script after DOM is ready -->
+    <!-- Add Markdown-It CDN in your HTML -->
+    <script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
+    <script>
+      const md = window.markdownit();
+
+      function formatMarkdown(text) {
+        return md.render(text); // Converts Markdown to HTML
+      }
+    </script>
+    <script src="js/gemini.js"></script>
     <script src="js/shared.js"></script>
     <script src="js/dashboard.js"></script>
     <script src="js/notifications.js"></script>

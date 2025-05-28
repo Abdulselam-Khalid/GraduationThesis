@@ -8,6 +8,7 @@ const groupRoutes = require("./routes/groups");
 const expenseRoutes = require("./routes/expenses");
 const notificationRoutes = require("./routes/notifications");
 const uploadRoutes = require('./routes/uploads');
+const geminiRoute = require('./routes/geminiRoute')
 const cookieParser = require("cookie-parser");
 
 const connectDB = require("./db/connect");
@@ -33,6 +34,7 @@ app.use("/api/tasks", taskRoutes);
 app.use("/api/groups", groupRoutes);
 app.use("/api/expenses", expenseRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use('/api/gemini', geminiRoute)
 app.use('/api/uploads', uploadRoutes);
 // Handle client-side routing
 app.get("*", (req, res) => {

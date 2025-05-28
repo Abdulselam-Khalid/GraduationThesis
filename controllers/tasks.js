@@ -71,7 +71,6 @@ const completeTask = async (req, res) => {
   try {
     // ✅ Find the task first
     const task = await Task.findById(req.params.id).populate('assignedTo', 'name');
-    console.log(task)
     if (!task) throw new Error("Task not found");
 
     // ✅ Update the task status
