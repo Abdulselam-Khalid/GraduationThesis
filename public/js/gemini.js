@@ -35,7 +35,7 @@ const sendMessage = async () => {
   aiPrompt.value = "";
 
   try {
-    const response = await fetch("http://localhost:5000/api/gemini/generate", {
+    const response = await fetch("http://localhost:5000/api/gemini/chat", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -47,8 +47,8 @@ const sendMessage = async () => {
 
     if (!response.ok) throw new Error("Failed to fetch response");
 
-    const generatedText = await response.json();
-    addMessage(formatMarkdown(generatedText.result));
+    const chatReply = await response.json();
+    addMessage(formatMarkdown(chatReply.result));
   } catch (error) {
     console.error(error);
     addMessage("Sorry, I encountered an error. Please try again.");

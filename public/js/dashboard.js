@@ -105,31 +105,31 @@ const fetchZenQuote = async () => {
     console.error("Error fetching quote:", error);
   }
 };
-const inputImage = ()=>{
-const fileInput = document.getElementById('fileInput');
+// const inputImage = ()=>{
+// const fileInput = document.getElementById('fileInput');
 
-fileInput.addEventListener('change', async (event) => {
-  const file = event.target.files[0];
-  const formData = new FormData();
-  formData.append('file', file);
+// fileInput.addEventListener('change', async (event) => {
+//   const file = event.target.files[0];
+//   const formData = new FormData();
+//   formData.append('file', file);
 
-  try {
-    const response = await fetch(`http://localhost:5000/api/uploads`, {
-      method: 'POST',
-      body: formData,
-      headers:{
-        Authorization: `Bearer ${token}`
-      }
-    });
+//   try {
+//     const response = await fetch(`http://localhost:5000/api/uploads`, {
+//       method: 'POST',
+//       body: formData,
+//       headers:{
+//         Authorization: `Bearer ${token}`
+//       }
+//     });
 
-    const data = await response.json();
-    console.log('Uploaded file info:', data);
-    fetchImage()
-  } catch (error) {
-    console.error('Error uploading file:', error);
-  }
-});
-}
+//     const data = await response.json();
+//     console.log('Uploaded file info:', data);
+//     fetchImage()
+//   } catch (error) {
+//     console.error('Error uploading file:', error);
+//   }
+// });
+// }
 
 
 const fetchAndRender = async () => {
@@ -156,7 +156,6 @@ const fetchAndRender = async () => {
 document.addEventListener("DOMContentLoaded", async () => {
   fetchAndRender();
   fetchZenQuote();
-  inputImage()
 });
 
 // Notification Bell Functionality

@@ -254,14 +254,25 @@ body {
 .dashboard-grid {
   flex: 1;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
   gap: 2rem;
   padding: 2rem;
   max-width: 1400px;
   margin: 0 auto;
   width: 100%;
 }
-
+.financial-grid, .roommate-grid, .tasks-grid{
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+  gap: 2rem;
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
 .card {
   background: #fff;
   border-radius: 16px;
@@ -524,7 +535,7 @@ body {
 }
 /* --- Responsive --- */
 @media (max-width: 1024px) {
-  .dashboard-grid {
+  .dashboard-grid, .financial-grid, .roommate-grid, .tasks-grid {
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 1.5rem;
     padding: 1.5rem;
@@ -584,7 +595,7 @@ body {
 }
 
 @media (max-width: 480px) {
-  .dashboard-grid {
+  .dashboard-grid, .financial-grid, .roommate-grid, .tasks-grid {
     grid-template-columns: 1fr;
     padding: 1rem;
     gap: 1rem;
