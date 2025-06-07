@@ -533,6 +533,17 @@ body {
 .toggle-button:hover {
   background: #0056b3;
 }
+
+.label-splitBetween{
+  display: block;
+}
+.Expense{
+  color: red;
+}
+.Income{
+  color: hsl(120, 74%, 50%);
+}
+
 /* --- Responsive --- */
 @media (max-width: 1024px) {
   .dashboard-grid, .financial-grid, .roommate-grid, .tasks-grid {

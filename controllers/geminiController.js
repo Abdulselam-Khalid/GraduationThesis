@@ -25,7 +25,6 @@ const startChat = async (req, res) => {
     // Combine external context with user prompt
     const fullPrompt = `${externalContext}\nUser Query: ${prompt}`;
     const result = await chat.sendMessage(fullPrompt);
-    console.log(fullPrompt)
     const chatReply = result.response.text();
 
     res.json({ result: chatReply });

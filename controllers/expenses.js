@@ -3,7 +3,7 @@ const Expense = require("../models/Expense.js");
 const getAllTransactions = async (req, res) => {
   const userId = req.userID;
   try {
-    const expenses = await Expense.find({ paidBy: userId });
+    const expenses = await Expense.find({ "split_between.roommate_id": userId });
     return res.status(200).json(expenses);
   } catch (error) {
     return res.status(500).json(error);
@@ -11,15 +11,15 @@ const getAllTransactions = async (req, res) => {
 };
 const addTransaction = async (req, res) => {
   const userId = req.userID;
-  const { type, amount, category, description, groupId } = req.body;
+  const { title, amount, category, dueDate, split_between } = req.body;
   try {
     const expense = await Expense.create({
-      type,
+      admin_id:userId,
+      title,
       amount,
       category,
-      description,
-      paidBy: userId,
-      groupId,
+      dueDate,
+      split_between
     });
     res.status(201).json(expense);
   } catch (error) {

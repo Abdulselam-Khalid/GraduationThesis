@@ -1,38 +1,33 @@
-// models/Expense.js
 const mongoose = require("mongoose");
 
-const expenseSchema = new mongoose.Schema({
-  type: {
-    type: String,
-    required: [true, "Type of transaction cannot be empty"],
-  },
-  amount: {
-    type: Number,
-    required: [true, "Amount cannot be empty"],
-  },
-  paidBy: {
+const ExpenseSchema = new mongoose.Schema({
+  admin_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
-    required: [true, "paidBy cannot be empty"],
+    required: true,
   },
-  groupId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Group",
-    required: [true, "Group Id cannot be empty"],
-  },
-  description: {
-    type: String,
-  },
-  date: {
-    type: Date,
-    default: Date.now,
-  },
+  title: { type: String, required: true },
+  amount: { type: Number, required: true },
   category: {
     type: String,
+    enum: ["Rent", "Utilities", "Groceries", "Other"],
+    required: true,
   },
-  notes: {
-    type: String,
+  date_uploaded: { type: Date, default: Date.now },
+  dueDate: {
+    type: Date,
+    default: () => new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // 5 days from nowy
   },
+  split_between: [
+    {
+      roommate_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+      },
+      status: { type: String, enum: ["pending", "paid"], default: "pending" },
+    },
+  ],
 });
 
-module.exports = mongoose.model("Expense", expenseSchema);
+module.exports = mongoose.model("Expense", ExpenseSchema);
