@@ -11,12 +11,13 @@ const getAllTransactions = async (req, res) => {
 };
 const addTransaction = async (req, res) => {
   const userId = req.userID;
-  const { title, amount, category, dueDate, split_between } = req.body;
+  const { title, amount,amount_owed, category, dueDate, split_between } = req.body;
   try {
     const expense = await Expense.create({
       admin_id:userId,
       title,
       amount,
+      amount_owed,
       category,
       dueDate,
       split_between
@@ -26,6 +27,30 @@ const addTransaction = async (req, res) => {
     return res.status(500).json(error);
   }
 };
+const payAmount = async (req, res) => {
+  const userId = req.userId;
+  const { transaction_id } = req.body;
+
+  try {
+    // ✅ Ensure the transaction exists
+    const expense = await Expense.findOne({ "split_between._id": transaction_id });
+    if (!expense) throw new Error("Transaction not found");
+
+    // ✅ Update the status of the specific roommate entry
+    const updated = await Expense.updateOne(
+      { "split_between._id": transaction_id },
+      { $set: { "split_between.$.status": "paid" } }
+    );
+
+    if (updated.modifiedCount === 0)
+      throw new Error("Payment status not updated");
+
+    res.status(200).json({ message: "Payment Successful" });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
 const deleteTransaction = async (req, res) => {
   try {
     const expense = await Expense.findByIdAndDelete(req.params.id);
@@ -38,4 +63,4 @@ const deleteTransaction = async (req, res) => {
     return res.status(500).json(error);
   }
 };
-module.exports = { getAllTransactions, addTransaction, deleteTransaction };
+module.exports = { getAllTransactions, addTransaction,payAmount, deleteTransaction };

@@ -4,12 +4,13 @@ const authMiddleware = require("../middleware/auth");
 const {
   getAllTransactions,
   addTransaction,
+  payAmount,
   deleteTransaction,
 } = require("../controllers/expenses");
 
 router.use(authMiddleware);
 
-router.route("/").get(getAllTransactions).post(addTransaction);
+router.route("/").get(getAllTransactions).post(addTransaction).patch(payAmount);
 
 router.route("/:id").delete(deleteTransaction);
 

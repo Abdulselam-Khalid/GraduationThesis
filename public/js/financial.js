@@ -3,6 +3,8 @@ const renderTransactions = async (transactions) => {
   const transactionsList = document.getElementById("transactions-list");
   transactionsList.innerHTML = ""; // Clear previous content
 
+  const currentUser = groupData.members.find((m) => m._id === userData.id);
+  const isAdmin = currentUser?.role === "admin";
   if (!transactionsList) return;
 
   const table = document.querySelector(".members-table");
@@ -16,6 +18,7 @@ const renderTransactions = async (transactions) => {
           <th>Title</th>
           <th>Category</th>
           <th>Amount</th>
+          <th>Due</th>
           <th>Action</th>
         </tr>
       </thead>
@@ -33,11 +36,24 @@ const renderTransactions = async (transactions) => {
                       <td class="${
                         transaction.type
                       }">$${transaction.amount.toFixed(2)}</td>
-                      <td>
-                        <button class="remove-button" data-id="${
-                          transaction._id
-                        }">X</button>
-                      </td>
+                      <td>$${transaction.amount_owed.toFixed(2)}</td>
+                      ${
+                        isAdmin
+                          ? `<td>
+                        <button class="remove-button" data-id="${transaction._id}">X</button>
+                      </td>`
+                          : `${
+                              transaction.split_between.find(
+                                (m) => m.roommate_id == userData.id
+                              ).status === "pending"
+                                ? `<td><button class="pay-button" data-id="${
+                                    transaction.split_between.find(
+                                      (m) => m.roommate_id === userData.id
+                                    )._id
+                                  }">Pay</button></td>`
+                                : "<td>Paid</td>"
+                            }`
+                      }
                     </tr>
                   `
           )
@@ -50,6 +66,14 @@ const renderTransactions = async (transactions) => {
       showConfirmationModal({
         message: "Are you sure you want to remove this transaction?",
         onConfirm: () => removeTransaction(e),
+      });
+    });
+  });
+  document.querySelectorAll(".pay-button").forEach((button) => {
+    button.addEventListener("click", (e) => {
+      showConfirmationModal({
+        message: "Please confirm that you have paid the amount owed",
+        onConfirm: () => payAmount(e),
       });
     });
   });
@@ -68,8 +92,7 @@ const fetchAndRender = async () => {
 
     if (!response.ok) throw new Error("Failed to fetch transactions");
 
-    const transactions = await response.json();
-    console.log(transactions)
+    const transactions = await response.json();    
     await renderTransactions(transactions);
   } catch (error) {
     console.error("Error loading transactions:", error);
@@ -81,6 +104,7 @@ const fetchAndRender = async () => {
 const addTransaction = async (
   title,
   amount,
+  amount_owed,
   category,
   dueDate,
   split_between
@@ -102,6 +126,7 @@ const addTransaction = async (
   const data = {
     title,
     amount,
+    amount_owed,
     category,
     ...(dueDate && { dueDate }),
     split_between: formattedSplitBetween,
@@ -183,9 +208,16 @@ const submitNewTransaction = () => {
   if (split_between.length === 0) {
     return alert("Please select at least one roommate to split with.");
   }
-
+  const amount_owed = parseFloat(amount / split_between.length);
   // Send transaction data with selected roommates
-  addTransaction(title, parseFloat(amount), category, dueDate, split_between);
+  addTransaction(
+    title,
+    parseFloat(amount),
+    amount_owed,
+    category,
+    dueDate,
+    split_between
+  );
 
   // Reset modal inputs
   [
@@ -201,6 +233,27 @@ const submitNewTransaction = () => {
   document.getElementById("select-all").checked = false;
 
   closeModal("addTransactionModal");
+};
+const payAmount = async (e) => {
+  const transaction_id = e.target.dataset.id;
+  try {
+    const response = await fetch("http://localhost:5000/api/expenses", {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ transaction_id })
+    });
+    if (!response.ok) throw new Error("Failed to process payment");
+    closeModal("confirmModal");
+    alert("Payment successful");
+    fetchAndRender();
+  } catch (error) {
+    console.error(error);
+    closeModal("confirmModal");
+    alert("There was an error. Payment unsuccessful");
+  }
 };
 
 // Setup event listeners
