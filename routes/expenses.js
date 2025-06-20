@@ -3,6 +3,7 @@ const router = express.Router();
 const authMiddleware = require("../middleware/auth");
 const {
   getAllTransactions,
+  getTransactions,
   addTransaction,
   payAmount,
   deleteTransaction,
@@ -10,7 +11,9 @@ const {
 
 router.use(authMiddleware);
 
-router.route("/").get(getAllTransactions).post(addTransaction).patch(payAmount);
+router.route("/admin").get(getAllTransactions);
+
+router.route("/").get(getTransactions).post(addTransaction).patch(payAmount);
 
 router.route("/:id").delete(deleteTransaction);
 

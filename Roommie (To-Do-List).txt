@@ -5,6 +5,7 @@ Upcoming deadlines in dashboard page (Done)
 Create the api to add and remove transactions (Done)
 Connect the add and remove transactions to the frontend
 Create notification system (Done)
-Add AI chat field option (In progress)
-Start the financial side of the website (In Progress)
-Adjust the display of transactions for users and admins
+Add AI chat field option (Done)
+Start the financial side of the website (Done)
+Adjust the display of transactions for users and admins (Done)
+Add settings page

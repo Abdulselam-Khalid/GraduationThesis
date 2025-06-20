@@ -10,57 +10,116 @@ const renderTransactions = async (transactions) => {
   const table = document.querySelector(".members-table");
 
   table.innerHTML = `
-    ${
-      transactions?.length
-        ? `<thead>
-        <tr>
-          <th>Date</th>
-          <th>Title</th>
-          <th>Category</th>
-          <th>Amount</th>
-          <th>Due</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody id="transactions-list">`
-        : `<tbody id="transactions-list"><tr><td style="text-align:center;">No transactions available.</td></tr></tbody>`
-    }
+  ${
+    transactions?.length
+      ? `
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Title</th>
+            <th>Category</th>
+            <th>Amount</th>
+            <th>Due</th>
+            <th>Due Date</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="transactions-list">
+          ${transactions
+            .map((transaction) => {
+              const userShare = transaction.split_between.find(
+                (m) => m.roommate_id === userData.id
+              );
 
-        ${transactions
-          .map(
-            (transaction) => `
-                    <tr>
-                      <td>${formatDate(transaction.date_uploaded)}</td>
-                      <td>${transaction.title}</td>
-                      <td>${transaction.category}</td>
-                      <td class="${
-                        transaction.type
-                      }">$${transaction.amount.toFixed(2)}</td>
-                      <td>$${transaction.amount_owed.toFixed(2)}</td>
-                      ${
-                        isAdmin
-                          ? `<td>
-                        <button class="remove-button" data-id="${transaction._id}">X</button>
-                      </td>`
-                          : `${
-                              transaction.split_between.find(
-                                (m) => m.roommate_id == userData.id
-                              ).status === "pending"
-                                ? `<td><button class="pay-button" data-id="${
-                                    transaction.split_between.find(
-                                      (m) => m.roommate_id === userData.id
-                                    )._id
-                                  }">Pay</button></td>`
-                                : "<td>Paid</td>"
-                            }`
-                      }
-                    </tr>
-                  `
-          )
-          .join("")}
-      </tbody>
+              let actionCell = "";
+
+              if (userShare?.status === "pending") {
+                actionCell += `<button class="pay-button" data-id="${userShare._id}">Pay</button> `;
+              }
+              if (userShare?.status === "paid") {
+                actionCell += "Paid ";
+              }
+              if (isAdmin) {
+                actionCell += `<button class="remove-button" data-id="${transaction._id}">X</button> `;
+              }
+
+              return `
+                <tr>
+                  <td>${formatDate(transaction.date_uploaded)}</td>
+                  <td>${transaction.title}</td>
+                  <td>${transaction.category}</td>
+                  <td class="${transaction.type}">$${transaction.amount.toFixed(
+                2
+              )}</td>
+                  <td>$${transaction.amount_owed.toFixed(2)}</td>
+                  <td>${formatDate(transaction.dueDate)}</td>
+                  <td>${actionCell}</td>
+                </tr>
+              `;
+            })
+            .join("")}
+        </tbody>
+      `
+      : `
+        <tbody id="transactions-list">
+          <tr><td colspan="7" style="text-align:center;">No transactions available.</td></tr>
+        </tbody>
+      `
+  }
+`;
+
+  if (isAdmin) {
+    try {
+      const response = await fetch("http://localhost:5000/api/expenses/admin", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      const expenses = await response.json();
+      const section = document.getElementById("history-section");
+      section.classList = "card transaction-history";
+      section.innerHTML = `
+      <h2>Transactions History</h2>
+      <div class="table-container">
+        <table class="members-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Title</th>
+              <th>Amount</th>
+              <th>Paid By</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${expenses
+              .sort(
+                (a, b) => new Date(b.date_uploaded) - new Date(a.date_uploaded)
+              ) // Sort by latest first
+              .slice(0, 5) // Take only the top 5
+              .map(
+                (expense) => `
+                  <tr>
+                    <td>${formatDate(expense.date_uploaded)}</td>
+                    <td>${expense.title}</td>
+                    <td>${expense.amount.toFixed(2)}</td>
+                    <td>${expense.split_between
+                      .filter((s) => s.status === "paid")
+                      .map((s) => s.roommate_id.name)
+                      .join(", ")}</td>
+                  </tr>
+                `
+              )
+              .join("")}
+          </tbody>
+        </table>
+      </div>
     `;
-
+    } catch (error) {
+      console.error(error);
+    }
+  }
   document.querySelectorAll(".remove-button").forEach((button) => {
     button.addEventListener("click", (e) => {
       showConfirmationModal({
@@ -92,7 +151,7 @@ const fetchAndRender = async () => {
 
     if (!response.ok) throw new Error("Failed to fetch transactions");
 
-    const transactions = await response.json();    
+    const transactions = await response.json();
     await renderTransactions(transactions);
   } catch (error) {
     console.error("Error loading transactions:", error);
@@ -243,7 +302,7 @@ const payAmount = async (e) => {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ transaction_id })
+      body: JSON.stringify({ transaction_id }),
     });
     if (!response.ok) throw new Error("Failed to process payment");
     closeModal("confirmModal");
