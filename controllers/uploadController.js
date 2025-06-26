@@ -22,26 +22,36 @@ const uploadFile = async (req, res) => {
       return res.status(400).json({ error: "No file uploaded" });
     }
 
-    // Generate unique filename
+    // Step 1: Check for existing file
+    const existingFiles = await bucket
+      .find({ "metadata.userId": req.userID })
+      .toArray();
+
+    if (existingFiles && existingFiles.length > 0) {
+      // Delete the first found file (or loop through all if needed)
+      await bucket.delete(existingFiles[0]._id);
+    }
+
+    // Step 2: Generate a unique filename
     const filename =
       crypto.randomBytes(16).toString("hex") +
       path.extname(req.file.originalname);
 
-    // Create upload stream
+    // Step 3: Create an upload stream
     const uploadStream = bucket.openUploadStream(filename, {
-        contentType: req.file.mimetype,
-        metadata: {
-            originalName: req.file.originalname,
-            uploadDate: new Date(),
-            userId: req.userID,
+      contentType: req.file.mimetype,
+      metadata: {
+        originalName: req.file.originalname,
+        uploadDate: new Date(),
+        userId: req.userID,
       },
     });
 
-    // Write file to GridFS
+    // Step 4: Write file to GridFS
     uploadStream.write(req.file.buffer);
     uploadStream.end();
 
-    // Wait for upload to complete
+    // Step 5: Wait for upload to finish
     await new Promise((resolve, reject) => {
       uploadStream.on("finish", resolve);
       uploadStream.on("error", reject);
@@ -49,7 +59,7 @@ const uploadFile = async (req, res) => {
 
     res.json({
       file: {
-        filename: filename,
+        filename,
         contentType: req.file.mimetype,
         size: req.file.size,
       },
@@ -59,6 +69,7 @@ const uploadFile = async (req, res) => {
     res.status(500).json({ error: "Error uploading file" });
   }
 };
+
 
 // Get file by filename
 const getFile = async (req, res) => {

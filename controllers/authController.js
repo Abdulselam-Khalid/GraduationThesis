@@ -93,4 +93,24 @@ const getAllUsers = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, login, findUser, getAllUsers };
+const updateUser = async (req, res) => {
+  const {name, email, userId} = req.body
+  try{
+    const user = await User.updateOne(
+      {_id:userId},
+      {$set:{name:name, email:email}}
+    )
+    const updatedInfo = await User.findById(userId)
+    res.status(200).json({
+      id: updatedInfo._id,
+      name: updatedInfo.name,
+      email: updatedInfo.email
+    });
+    
+  }
+  catch(error){
+    console.error(error)
+  }
+}
+
+module.exports = { registerUser, login, findUser, getAllUsers, updateUser };

@@ -7,6 +7,7 @@ const {
   login,
   findUser,
   getAllUsers,
+  updateUser,
 } = require("../controllers/authController");
 
 const router = express.Router();
@@ -19,6 +20,8 @@ router.post("/login", login);
 
 // GET /api/auth/users
 router.get("/users", getAllUsers);
+
+router.put("/update", updateUser)
 
 // GET /api/auth/:id (must be last to avoid conflicts)
 router.get("/:id", findUser);

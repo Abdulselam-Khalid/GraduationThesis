@@ -22,18 +22,6 @@ const groups = async () => {
     sessionStorage.setItem("groupData", JSON.stringify(await response.json()));
   } catch (error) {}
 };
-
-/*
-const member = groupData.members.find((m) => m._id === userData.id);
-console.log(member);
-
-if (member && member.role === "admin") {
-  const link = document.createElement('a')
-  link.href = 'financial.html'
-  link.innerHTML = 'Financial'
-  document.querySelector('.sidebar-nav').append(link)
-}
-*/
 function openModal(modalId) {
   const modal = document.getElementById(modalId);
   modal.style.display = "block";

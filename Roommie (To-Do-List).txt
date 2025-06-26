@@ -8,4 +8,4 @@ Create notification system (Done)
 Add AI chat field option (Done)
 Start the financial side of the website (Done)
 Adjust the display of transactions for users and admins (Done)
-Add settings page
+Add settings page (In progress)
